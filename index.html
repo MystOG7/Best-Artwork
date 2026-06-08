@@ -473,7 +473,7 @@
             <h1>✨ My Art Gallery ✨</h1>
             <div class="divider"></div>
             <p class="subtitle">Where Every Stroke Tells a Story</p>
-            <p class="art-count">78 Beautiful Artworks • Curated with Love</p>
+            <p class="art-count">13 Beautiful Artworks • Curated with Love</p>
         </div>
     </header>
 
@@ -481,13 +481,7 @@
         <div class="nav-tabs">
             <button class="nav-tab active" onclick="showCategory('all')">All Artworks</button>
             <button class="nav-tab" onclick="showCategory('calligraphy')">Islamic Calligraphy</button>
-            <button class="nav-tab" onclick="showCategory('architecture')">Islamic Architecture</button>
-            <button class="nav-tab" onclick="showCategory('awareness')">Awareness Art</button>
             <button class="nav-tab" onclick="showCategory('nature')">Nature & Landscapes</button>
-            <button class="nav-tab" onclick="showCategory('journal')">Quranic Journal</button>
-            <button class="nav-tab" onclick="showCategory('reminders')">Islamic Reminders</button>
-            <button class="nav-tab" onclick="showCategory('portraits')">Portraits & Eyes</button>
-            <button class="nav-tab" onclick="showCategory('ramadan')">Ramadan Cards</button>
             <button class="nav-tab" onclick="showCategory('other')">Other Artworks</button>
         </div>
     </nav>
@@ -521,118 +515,113 @@
 
     <footer>
         <p>Made with <span class="heart">❤</span> for beautiful art</p>
-        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7;">78 artworks of faith, creativity, and passion</p>
+        <p style="margin-top: 8px; font-size: 0.8rem; opacity: 0.7;">13 artworks of faith, creativity, and passion</p>
     </footer>
 
     <script>
-        // ==================== DATA ====================
+        // ==================== CORRECTED ARTWORK DATA ====================
+        // Each image is now correctly mapped to its actual visual content
         const artworks = [
-            { src: "Screenshot_20260608_130926_Instagram.jpg", title: "Calligraphy Collection", category: "Islamic Calligraphy", praise: "A stunning ensemble of divine words painted with such devotion! Each piece radiates spiritual warmth and artistic mastery." },
-            { src: "Screenshot_20260608_130939_Instagram.jpg", title: "Watercolor Calligraphy Strips", category: "Islamic Calligraphy", praise: "The way watercolor blends with sacred verses is absolutely magical! Like poetry floating on clouds of color." },
-            { src: "Screenshot_20260608_130951_Instagram.jpg", title: "Minar-e-Pakistan", category: "Islamic Architecture", praise: "Green and white perfection! The way you captured our beloved monument with such patriotic spirit is truly admirable." },
-            { src: "Screenshot_20260608_131000_Instagram.jpg", title: "Serene Mountain Landscape", category: "Nature & Landscapes", praise: "This landscape feels like a window to Jannah! The reflections in the water are so peaceful and beautifully done." },
-            { src: "Screenshot_20260608_131011_Instagram.jpg", title: "Palestine Awareness Poster", category: "Awareness & Social Art", praise: "Art with a powerful message! Your voice through colors speaks volumes about justice, humanity, and compassion." },
-            { src: "Screenshot_20260608_131024_Instagram.jpg", title: "Anatomical Heart", category: "Other Artworks", praise: "The detail on this heart is incredible! You have such a steady hand and amazing understanding of anatomy." },
-            { src: "Screenshot_20260608_131040_Instagram.jpg", title: "Moon Art", category: "Nature & Landscapes", praise: "The moon looks so real and dreamy! Your shading technique captures the craters and glow perfectly. Simply mesmerizing!" },
-            { src: "Screenshot_20260608_131106_Instagram.jpg", title: "Green Dome Mosque", category: "Islamic Architecture", praise: "The iconic green dome captured with such love and reverence! The sunset colors make it look even more heavenly." },
-            { src: "Screenshot_20260608_131112_Instagram.jpg", title: "And He is With You Calligraphy", category: "Islamic Calligraphy", praise: "The roses frame this beautiful verse so elegantly! It feels like a warm hug from Allah through your art." },
-            { src: "Screenshot_20260608_131117_Instagram.jpg", title: "Ya Hussain Calligraphy", category: "Islamic Calligraphy", praise: "The deep red background with the golden dome is so powerful and emotional! A beautiful tribute filled with love and respect." },
-            { src: "Screenshot_20260608_131122_Instagram.jpg", title: "Hasbunallahu wa Ni'mal Wakeel", category: "Islamic Calligraphy", praise: "The keffiyeh border makes this so meaningful! A powerful reminder that Allah is sufficient, painted with such grace." },
-            { src: "Screenshot_20260608_131131_Instagram.jpg", title: "La ilaha illallah", category: "Islamic Calligraphy", praise: "The golden calligraphy on dark green is absolutely majestic! This piece radiates the light of Tawheed in every stroke." },
-            { src: "Screenshot_20260608_131139_Instagram.jpg", title: "Palestine Journal Spread", category: "Awareness & Social Art", praise: "The watermelon flag design is so creative! Combined with the beautiful floral calligraphy, this spread is pure art with purpose." },
-            { src: "Screenshot_20260608_131153_Instagram.jpg", title: "Kaaba & Green Dome Cards", category: "Islamic Architecture", praise: "Two holy places in one beautiful frame! The watercolor washes give such a soft, spiritual glow to both sacred sites." },
-            { src: "Screenshot_20260608_131206_Instagram.jpg", title: "Mosque-Shaped Calligraphy", category: "Islamic Calligraphy", praise: "The way you shaped the calligraphy into a mosque silhouette is pure genius! Such creative and devoted artistry." },
-            { src: "Screenshot_20260608_131213_Instagram.jpg", title: "Allah on Tree Bark", category: "Islamic Calligraphy", praise: "Nature meets divine art! The rustic tree bark canvas with the powerful name of Allah is so unique and deeply moving." },
-            { src: "Screenshot_20260608_131221_Instagram.jpg", title: "Candle & Flower Calligraphy", category: "Islamic Calligraphy", praise: "The glowing candle and the radiant flower calligraphy together create such a warm, spiritual atmosphere. Beautifully balanced!" },
-            { src: "Screenshot_20260608_131226_Instagram.jpg", title: "Dome Under the Moonlight", category: "Islamic Architecture", praise: "The night sky with the glowing moon and the sacred green dome is simply breathtaking! A dreamy piece full of barakah." },
-            { src: "Screenshot_20260608_131232_Instagram.jpg", title: "Surah Duha Journal - Stars", category: "Quranic Journal Art", praise: "The starry night theme for Surah Duha is so fitting! Your journal spreads are educational and stunningly beautiful at the same time." },
-            { src: "Screenshot_20260608_131243_Instagram.jpg", title: "Surah Duha Journal - Roses", category: "Quranic Journal Art", praise: "The roses and torn paper aesthetic is so artistic! This journal page feels like a warm, hopeful embrace. Simply lovely!" },
-            { src: "Screenshot_20260608_131252_Instagram.jpg", title: "Elegant Quranic Reminders", category: "Islamic Reminders", praise: "Beautiful handwritten reminders filled with soothing verses. Such meticulous and thoughtful work!" },
-            { src: "Screenshot_20260608_131300_Instagram.jpg", title: "Premium Reminder Collection", category: "Islamic Reminders", praise: "The sophisticated borders and vibrant text elevate these verses into a truly premium collection of daily spiritual boosts." },
-            { src: "Screenshot_20260608_131306_Instagram.jpg", title: "Surah Duha Floral Spread", category: "Quranic Journal Art", praise: "The intricate floral borders framing Surah Duha are absolutely gorgeous. A masterpiece of dedication and patience!" },
-            { src: "Screenshot_20260608_131328_Instagram.jpg", title: "Sujood at Sunset", category: "Nature & Landscapes", praise: "A deeply moving painting capturing the peace of prayer amidst a breathtaking sunset. So atmospheric!" },
-            { src: "Screenshot_20260608_131334_Instagram.jpg", title: "Sunflower Hardship & Ease", category: "Nature & Landscapes", praise: "Bright sunflowers bringing the verse 'With hardship comes ease' to life. Such a cheerful and comforting piece!" },
-            { src: "Screenshot_20260608_131342_Instagram.jpg", title: "Starry Night Islamic Journal", category: "Quranic Journal Art", praise: "A brilliant fusion of Van Gogh's style with sacred Islamic journaling. Truly a creative masterpiece!" },
-            { src: "Snapchat-1470198826(1).jpg", title: "Mystic Purple Moon", category: "Other Artworks", praise: "The swirling purples and blues inside this moon create such a dreamy, mystical vibe. Beautifully shaded!" },
-            { src: "IMG_20260608_132714_138.jpg", title: "Dervish Spirituality Journal", category: "Quranic Journal Art", praise: "An abstract and profound expression of faith. The whirling dervish alongside elegant calligraphy makes this page echo with deep spirituality." },
-            { src: "Snapchat-705301948.jpg", title: "Cosmic Garden Painting", category: "Other Artworks", praise: "A breathtaking cosmic garden with swirling galaxies, cherry blossoms, and a mystical UFO beam! The colors are absolutely out of this world!" },
-            { src: "Snapchat-1497800412.jpg", title: "Iridescent Eye on Grass", category: "Portraits & Eyes", praise: "The way you captured the iridescent blue eye against the natural grass background is so striking! Nature meets surreal beauty." },
-            { src: "IMG_20260608_153459_462.jpg", title: "Mosque Architecture Sketch", category: "Islamic Architecture", praise: "Your architectural sketch of the mosque shows such precision and understanding of Islamic design! The pencil work is beautifully detailed." },
-            { src: "IMG_20260608_153500_951.jpg", title: "Arabic Calligraphy on Pink", category: "Islamic Calligraphy", praise: "The soft pink watercolor wash behind the bold Arabic calligraphy creates such a gentle yet powerful contrast. So elegant!" },
-            { src: "IMG_20260608_153502_427.jpg", title: "Palestine Solidarity Art", category: "Awareness & Social Art", praise: "A powerful piece of solidarity art! The watermelon colors and the keffiyeh pattern speak so loudly for justice and freedom." },
-            { src: "IMG_20260608_153503_773.jpg", title: "Anime Eyes Sketch", category: "Portraits & Eyes", praise: "Those anime eyes are drawn with such expressive detail! The purple shading gives them such a magical, soulful depth." },
-            { src: "IMG_20260608_153505_004.jpg", title: "Beautiful Eyes, Beautiful Soul", category: "Portraits & Eyes", praise: "What a meaningful piece! The realistic eye paired with the heartfelt message shows both your artistic and emotional depth." },
-            { src: "IMG_20260608_153506_986.jpg", title: "Defying Fate Together", category: "Portraits & Eyes", praise: "The romantic message paired with those beautifully drawn eyes creates such an intimate, touching artwork. So full of emotion!" },
-            { src: "IMG_20260608_153508_569.jpg", title: "Eyes Are Windows of the Soul", category: "Portraits & Eyes", praise: "The Arabic proverb 'Eyes are the windows of the soul' paired with these stunningly realistic eyes is pure poetic perfection!" },
-            { src: "IMG_20260608_153510_386.jpg", title: "Rainbow Beach Sunset", category: "Nature & Landscapes", praise: "A vibrant rainbow over a dreamy beach sunset! The palm silhouettes and colorful sky create such a tropical paradise vibe." },
-            { src: "IMG_20260608_153519_921.jpg", title: "Enchanted Forest Stream", category: "Nature & Landscapes", praise: "This enchanted forest with the flowing stream and wildflowers feels like a fairy tale come to life! So peaceful and magical." },
-            { src: "IMG_20260608_153521_537.jpg", title: "Sunset Calligraphy Art", category: "Islamic Calligraphy", praise: "The bold Arabic calligraphy against the warm sunset gradient is absolutely stunning! The colors blend so beautifully with the sacred words." },
-            { src: "IMG_20260608_153529_186.jpg", title: "Tulip & Bismillah Art", category: "Islamic Calligraphy", praise: "The colorful tulips framing the beautiful Bismillah calligraphy create such a fresh, spring-like spiritual feeling. Gorgeous composition!" },
-            { src: "IMG_20260608_153530_639.jpg", title: "Surah Al-Ikhlas Journal Page", category: "Quranic Journal Art", praise: "Your Surah Al-Ikhlas journal spread is so educational and beautifully organized! The color-coded notes make learning so inviting." },
-            { src: "IMG_20260608_153531_913.jpg", title: "Surah Al-Falaq Journal", category: "Quranic Journal Art", praise: "The creative doodles and colorful accents around Surah Al-Falaq make this journal page so lively and engaging! Beautiful work!" },
-            { src: "IMG_20260608_153535_675.jpg", title: "Surah An-Nas Journal", category: "Quranic Journal Art", praise: "The green-themed Surah An-Nas journal page with the money border design is so creative! A perfect blend of art and faith." },
-            { src: "IMG_20260608_153537_137.jpg", title: "Surah Al-Kafirun Journal", category: "Quranic Journal Art", praise: "The pink and purple watercolor splashes around Surah Al-Kafirun create such a vibrant, joyful learning atmosphere! Simply lovely!" },
-            { src: "IMG_20260608_153538_463.jpg", title: "Surah Al-Kawthar Journal", category: "Quranic Journal Art", praise: "The blue water-themed Surah Al-Kawthar page is so fitting! The fountain illustration beautifully represents the abundance of Allah's blessings." },
-            { src: "IMG_20260608_153541_537.jpg", title: "Colorful Ramadan Cards", category: "Ramadan Cards", praise: "A delightful collection of colorful Ramadan Mubarak cards! Each one is uniquely designed with such festive creativity and love." },
-            { src: "IMG_20260608_153553_039.jpg", title: "Red & Gold Ramadan Cards", category: "Ramadan Cards", praise: "The red and gold Ramadan card collection is so elegant and celebratory! The mosque silhouettes add such a beautiful traditional touch." },
-            { src: "IMG_20260608_153603_086.jpg", title: "Pink Ramadan Cards Collection", category: "Ramadan Cards", praise: "These adorable pink Ramadan Mubarak cards are so sweet and festive! Each tiny card is a little masterpiece of love and celebration." },
-            { src: "IMG_20260608_153604_569.jpg", title: "Blue & Pink Ramadan Cards", category: "Ramadan Cards", praise: "The combination of blue and pink with beautiful mosque silhouettes creates such a harmonious Ramadan greeting collection! Simply lovely!" },
-            { src: "IMG_20260608_153607_695.jpg", title: "Minimalist Blue Ramadan Cards", category: "Ramadan Cards", praise: "The minimalist blue Ramadan cards with elegant mosque designs show such refined taste! Less is truly more in this beautiful set." },
-            { src: "IMG_20260608_153609_292.jpg", title: "Floral Ramadan in Advance Cards", category: "Ramadan Cards", praise: "The floral 'Ramadan Mubarak in advance' cards are so thoughtful and beautifully decorated! The watercolor flowers add such a delicate charm." },
-            { src: "IMG_20260608_153614_861.jpg", title: "Purple & Pink Ramadan Cards", category: "Ramadan Cards", praise: "The purple and pink gradient Ramadan cards with crescent moons are absolutely gorgeous! Such a dreamy color palette for blessed greetings." },
-            { src: "IMG_20260608_153616_136.jpg", title: "Surah Baqarah Calligraphy", category: "Islamic Calligraphy", praise: "The magnificent Surah Baqarah calligraphy with ornate geometric borders is absolutely breathtaking! Such devotion in every stroke." },
-            { src: "IMG_20260608_153617_878.jpg", title: "Ar-Rahman Gold Calligraphy", category: "Islamic Calligraphy", praise: "The golden Ar-Rahman calligraphy against the blue geometric patterns is so regal and divine! A true masterpiece of Islamic art." },
-            { src: "IMG_20260608_153620_912.jpg", title: "Dua, Sabr & Shukr Floral Cards", category: "Islamic Calligraphy", praise: "These three floral calligraphy cards for Dua, Sabr, and Shukr are so elegant! The roses intertwined with sacred words create pure beauty." },
-            { src: "IMG_20260608_153639_988.jpg", title: "Sabr on Rainbow Watercolor", category: "Islamic Calligraphy", praise: "The word 'Sabr' on a vibrant rainbow watercolor background is so uplifting! A beautiful reminder that patience brings colorful blessings." },
-            { src: "IMG_20260608_153700_888.jpg", title: "Salamun Qaulan Calligraphy", category: "Islamic Calligraphy", praise: "The graceful 'Salamun qaulan min Rabbin raheem' with delicate flower vases is so peaceful! It radiates divine tranquility in every letter." },
-            { src: "IMG_20260608_153730_893.jpg", title: "Importance of Salah Journal", category: "Quranic Journal Art", praise: "The 'Importance of Salah' journal page with the praying figure is so educational and heartwarming! A beautiful reminder of our daily connection with Allah." },
-            { src: "IMG_20260608_153732_491.jpg", title: "Salah Benefits Mosaic Journal", category: "Quranic Journal Art", praise: "The detailed Salah benefits journal with the stunning blue mosaic border is absolutely magnificent! Such creative and informative Islamic art." },
-            { src: "IMG_20260608_153733_935.jpg", title: "Improve Your Salah Guide", category: "Quranic Journal Art", praise: "The 'Improve Your Salah' guide with practical tips in both Urdu and English is so helpful and beautifully designed! A true labor of love." },
-            { src: "IMG_20260608_153735_740.jpg", title: "Sunflower Watercolor Painting", category: "Nature & Landscapes", praise: "These sunflowers painted in watercolor are so bright and cheerful! The way you captured their golden petals against the blue sky is simply delightful." },
-            { src: "IMG_20260608_153737_351.jpg", title: "Tulip Colored Pencil Drawing", category: "Nature & Landscapes", praise: "The tulip drawing in colored pencil shows such amazing detail and shading! The pink and white flowers look almost real. Stunning botanical art!" },
-            { src: "IMG_20260608_153739_018.jpg", title: "Disenthal Freedom Art", category: "Other Artworks", praise: "The conceptual 'Disenthal Freedom' art with the handprint and spider web is so thought-provoking! A powerful piece about breaking free from illusions." },
-            { src: "IMG_20260608_153740_401.jpg", title: "Space Popup Book", category: "Other Artworks", praise: "The space-themed popup book with planets, rocket, and asteroids is absolutely incredible! Such creative 3D paper engineering and cosmic imagination." },
-            { src: "IMG_20260608_153741_893.jpg", title: "Tangled Lanterns Scene", category: "Other Artworks", praise: "The Tangled-inspired lantern scene with the castle and boat is so romantic and magical! The floating lights create such a dreamy atmosphere." },
-            { src: "IMG_20260608_153743_826.jpg", title: "Hand-Painted Sunflower Pen Holder", category: "Other Artworks", praise: "The hand-painted sunflower pen holder is such a practical work of art! Turning everyday objects into beautiful canvases shows true artistic spirit." },
-            { src: "IMG_20260608_153745_793.jpg", title: "Anime Portrait with Hat", category: "Other Artworks", praise: "The anime-style portrait with the stylish hat is so cool and expressive! The orange hair and confident pose capture such vibrant personality." },
-            { src: "IMG_20260608_153759_903.jpg", title: "Fa Inna Ma'al Usri Yusra - Pink Mosque Art", category: "Islamic Calligraphy", praise: "A gorgeous pink watercolor piece with the beautiful verse 'With hardship comes ease' surrounded by mosque domes and stars. The color palette is so soothing and spiritually uplifting!" },
-            { src: "IMG_20260608_153802_545.jpg", title: "99 Names of Allah Colorful Grid", category: "Islamic Calligraphy", praise: "A stunning grid of Allah's 99 names painted in vibrant watercolor squares! Each name is written with such precision and love. The golden borders add such a beautiful finishing touch." },
-            { src: "IMG_20260608_153804_712.jpg", title: "Latifun Khabir Gold Calligraphy", category: "Islamic Calligraphy", praise: "The golden Arabic calligraphy on a dark mystical background with intricate floral patterns is absolutely regal! The contrast between the gold and deep colors creates such a divine atmosphere." },
-            { src: "IMG_20260608_153811_271.jpg", title: "Excellent Reward for Righteous Workers", category: "Islamic Calligraphy", praise: "The watercolor roses and soft green background make this Quranic verse from Surah Al-Ankabut so inviting! The English translation paired with elegant Arabic is beautifully balanced." },
-            { src: "IMG_20260608_153827_720.jpg", title: "Sunflower Verse Art", category: "Islamic Calligraphy", praise: "A bright sunflower bursting with the verse 'So remember Me, I will remember you'! The cheerful yellow against the turquoise background is so refreshing and joyful." },
-            { src: "IMG_20260608_153830_263.jpg", title: "Rose Silhouette in Hand", category: "Other Artworks", praise: "A dramatic black silhouette of a hand holding a rose against a warm beige background! The contrast and simplicity create such a powerful, romantic visual. Truly elegant!" },
-            { src: "IMG_20260608_153831_869.jpg", title: "Naruto Character Collage", category: "Other Artworks", praise: "An amazing collection of Naruto characters drawn with such vibrant colors! The way you captured each character's unique style and personality is absolutely fantastic. Anime fan art at its best!" },
-            { src: "IMG_20260608_153833_704.jpg", title: "Traditional Sari Portrait", category: "Portraits & Eyes", praise: "A beautiful portrait of a woman in a colorful traditional sari against a soft pink background! The intricate patterns on the sari and the graceful pose show such cultural appreciation and artistic skill." },
-            { src: "IMG_20260608_153835_187.jpg", title: "Noor Ki Dua - Handwritten Prayer", category: "Islamic Calligraphy", praise: "A heartfelt handwritten dua in beautiful Urdu calligraphy with red accents! The personal touch and devotion in every word makes this piece so special and spiritually moving." },
-            { src: "IMG_20260608_153838_529.jpg", title: "Pixel Sunset Cityscape", category: "Other Artworks", praise: "A creative pixel-art style cityscape at sunset with beautiful color blocking! The way you blended warm oranges and cool blues creates such a modern, digital-art aesthetic. So innovative!" }
+            {
+                src: "32196.jpg",
+                title: "Salamun Qaulan Calligraphy",
+                category: "Islamic Calligraphy",
+                praise: "The graceful 'Salamun qaulan min Rabbin raheem' calligraphy on lined paper is so peaceful and elegant! The neat Arabic script paired with the English translation creates such a spiritually uplifting piece. Truly divine tranquility in every stroke."
+            },
+            {
+                src: "32198.jpg",
+                title: "Tulip Colored Pencil Drawing",
+                category: "Nature & Landscapes",
+                praise: "These tulips drawn in colored pencil show such amazing detail and beautiful shading! The pink and white flowers with vibrant green leaves look so lively and delicate. Stunning botanical art that captures nature's elegance perfectly."
+            },
+            {
+                src: "32200.jpg",
+                title: "Tangled Lanterns Scene",
+                category: "Other Artworks",
+                praise: "The Tangled-inspired lantern scene with the castle and boat is so romantic and magical! The floating lights reflecting on the water create such a dreamy, enchanting atmosphere. A truly captivating watercolor masterpiece!"
+            },
+            {
+                src: "32202.jpg",
+                title: "Hand-Painted Sunflower Pen Holder",
+                category: "Other Artworks",
+                praise: "The hand-painted sunflower pen holder is such a practical work of art! Turning an everyday glass jar into a beautiful canvas with that vibrant orange sunflower shows true artistic spirit and creativity. So innovative!"
+            },
+            {
+                src: "32204.jpg",
+                title: "Anime Portrait with Hat",
+                category: "Other Artworks",
+                praise: "The anime-style portrait with the stylish hat is so cool and expressive! The orange hair and confident pose capture such a vibrant personality. The watercolor technique gives it such a unique, artistic charm."
+            },
+            {
+                src: "32206.jpg",
+                title: "Fa Inna Ma'al Usri Yusra - Pink Mosque Art",
+                category: "Islamic Calligraphy",
+                praise: "A gorgeous pink watercolor piece with the beautiful verse 'With hardship comes ease' surrounded by mosque domes and stars. The color palette is so soothing and spiritually uplifting! The glitter accents add such a lovely touch."
+            },
+            {
+                src: "32208.jpg",
+                title: "99 Names of Allah Colorful Grid",
+                category: "Islamic Calligraphy",
+                praise: "A stunning grid of Allah's 99 names painted in vibrant watercolor with golden borders! Each name is beautifully written in elegant Arabic script across a rainbow of colors. Such devotion and artistic mastery in one magnificent piece!"
+            },
+            {
+                src: "32210.jpg",
+                title: "Latifun Khabir Gold Calligraphy",
+                category: "Islamic Calligraphy",
+                praise: "The golden Arabic calligraphy on a dark mystical background with intricate floral patterns is absolutely regal! The contrast between the gold lettering and deep teal colors creates such a divine, reverent atmosphere."
+            },
+            {
+                src: "32212.jpg",
+                title: "Excellent Reward for Righteous Workers",
+                category: "Islamic Calligraphy",
+                praise: "The watercolor roses and soft green background make this Quranic verse from Surah Al-Ankabut so inviting! The English translation paired with elegant Arabic calligraphy is beautifully balanced. Such a peaceful and inspiring composition."
+            },
+            {
+                src: "32214.jpg",
+                title: "Sunflower Verse Art",
+                category: "Islamic Calligraphy",
+                praise: "A bright sunflower bursting with the verse 'So remember Me, I will remember you'! The cheerful yellow petals against the turquoise watercolor background is so refreshing and joyful. A beautiful reminder of divine connection!"
+            },
+            {
+                src: "32216.jpg",
+                title: "Rose Silhouette in Hand",
+                category: "Other Artworks",
+                praise: "A dramatic black silhouette of a hand holding a rose against a warm beige background! The contrast and simplicity create such a powerful, romantic visual. The red border frames it perfectly. Truly elegant and emotionally moving!"
+            },
+            {
+                src: "32218.jpg",
+                title: "Naruto Character Collage",
+                category: "Other Artworks",
+                praise: "An amazing collection of Naruto characters drawn with such vibrant colors! The way you captured each character's unique style and personality is absolutely fantastic. Anime fan art at its best — full of energy and nostalgia!"
+            },
+            {
+                src: "32220.jpg",
+                title: "Traditional Sari Portrait",
+                category: "Other Artworks",
+                praise: "A beautiful portrait of a woman in a colorful traditional sari against a soft pink background! The intricate patterns on the sari with dots, stripes, and floral motifs show such cultural appreciation and artistic skill. Graceful and gorgeous!"
+            }
         ];
 
         // ==================== CATEGORY MAPPING ====================
         const categoryMap = {
-            'all': { title: 'All Artworks', desc: 'A beautiful collection of creativity, faith, and expression — 78 masterpieces', filter: () => true },
+            'all': { title: 'All Artworks', desc: 'A beautiful collection of creativity, faith, and expression', filter: () => true },
             'calligraphy': { title: 'Islamic Calligraphy', desc: 'Sacred words transformed into visual poetry through beautiful Arabic script', filter: a => a.category === 'Islamic Calligraphy' },
-            'architecture': { title: 'Islamic Architecture', desc: 'Mosques, domes, and sacred structures captured with love and reverence', filter: a => a.category === 'Islamic Architecture' },
-            'awareness': { title: 'Awareness & Social Art', desc: 'Powerful art that speaks for justice, humanity, and compassion', filter: a => a.category === 'Awareness & Social Art' },
-            'nature': { title: 'Nature & Landscapes', desc: 'The beauty of Allah\'s creation captured in colors and strokes', filter: a => a.category === 'Nature & Landscapes' },
-            'journal': { title: 'Quranic Journal Art', desc: 'Beautiful spreads that make learning the Quran a visual delight', filter: a => a.category === 'Quranic Journal Art' },
-            'reminders': { title: 'Islamic Reminders', desc: 'Daily doses of spiritual motivation in elegant designs', filter: a => a.category === 'Islamic Reminders' },
-            'portraits': { title: 'Portraits & Eyes', desc: 'Windows to the soul captured with stunning detail and emotion', filter: a => a.category === 'Portraits & Eyes' },
-            'ramadan': { title: 'Ramadan Cards', desc: 'Festive greetings filled with love, light, and blessed celebrations', filter: a => a.category === 'Ramadan Cards' },
+            'nature': { title: 'Nature & Landscapes', desc: "The beauty of Allah's creation captured in colors and strokes", filter: a => a.category === 'Nature & Landscapes' },
             'other': { title: 'Other Artworks', desc: 'Unique creations that showcase the breadth of your artistic talent', filter: a => a.category === 'Other Artworks' }
         };
 
         // ==================== RENDER GALLERY ====================
         function renderGallery() {
             const main = document.getElementById('gallery-main');
-            
+
             Object.keys(categoryMap).forEach(catId => {
                 const cat = categoryMap[catId];
                 const filtered = artworks.filter(cat.filter);
-                
+
                 const section = document.createElement('section');
                 section.id = catId;
                 section.className = `category-section${catId === 'all' ? ' active' : ''}`;
-                
+
                 section.innerHTML = `
                     <h2 class="category-title">${cat.title}</h2>
                     <p class="category-desc">${cat.desc} — ${filtered.length} artwork${filtered.length !== 1 ? 's' : ''}</p>
@@ -659,7 +648,7 @@
                         `).join('')}
                     </div>
                 `;
-                
+
                 main.appendChild(section);
             });
         }
@@ -719,7 +708,7 @@
             zoomLevelEl.textContent = Math.round(zoomLevel * 100) + '%';
             zoomInBtn.disabled = zoomLevel >= 5;
             zoomOutBtn.disabled = zoomLevel <= 0.5;
-            
+
             if (zoomLevel > 1) {
                 lightboxImg.classList.add('zoomed');
                 lightboxWrapper.classList.add('is-zoomed');
@@ -729,7 +718,7 @@
                 translateX = 0;
                 translateY = 0;
             }
-            
+
             applyTransform();
         }
 
@@ -765,9 +754,9 @@
         function openLightbox(index) {
             currentIndex = index;
             const art = artworks[currentIndex];
-            
+
             resetZoom();
-            
+
             lightboxImg.style.animation = 'none';
             lightboxImg.classList.remove('error');
             document.getElementById('lightbox-error').classList.remove('active');
@@ -861,7 +850,7 @@
         // ==================== KEYBOARD NAVIGATION ====================
         document.addEventListener('keydown', function(e) {
             if (!lightbox.classList.contains('active')) return;
-            
+
             switch(e.key) {
                 case 'Escape': closeLightbox(); break;
                 case 'ArrowLeft': prevImage(); break;
@@ -901,11 +890,10 @@
 
         // ==================== INITIALIZE ====================
         renderGallery();
-        
+
         document.querySelectorAll('.art-card').forEach(card => {
             observer.observe(card);
         });
     </script>
 </body>
 </html>
-
