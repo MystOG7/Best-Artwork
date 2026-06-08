@@ -1,3 +1,8 @@
+<!-- 
+    ✨ My Art Gallery - GitHub Ready
+    78 Artworks | 10 Categories | Lightbox with Zoom & Pan
+    Set IMAGE_BASE_URL in the script section for your GitHub setup
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -383,6 +388,16 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        .lightbox-error {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--lavender); font-size: 1.2rem; text-align: center;
+            z-index: 1001;
+        }
+        .lightbox-error.active { display: flex; }
+        .lightbox-error .icon { font-size: 4rem; margin-bottom: 15px; }
+
         .lightbox-close {
             position: absolute; top: 20px; right: 20px;
             width: 48px; height: 48px; background: rgba(123,44,191,0.3);
@@ -420,7 +435,17 @@
         }
 
         @media (max-width: 768px) {
-            .lightbox-close { width: 42px; height: 42px; top: 15px; right: 15px; }
+            .lightbox-error {
+            display: none; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); flex-direction: column;
+            align-items: center; justify-content: center;
+            color: var(--lavender); font-size: 1.2rem; text-align: center;
+            z-index: 1001;
+        }
+        .lightbox-error.active { display: flex; }
+        .lightbox-error .icon { font-size: 4rem; margin-bottom: 15px; }
+
+        .lightbox-close { width: 42px; height: 42px; top: 15px; right: 15px; }
             .lightbox-controls { bottom: 20px; padding: 8px 15px; gap: 8px; }
             .lb-btn { width: 38px; height: 38px; font-size: 1rem; }
             .lightbox-info { max-width: 200px; padding: 8px 12px; top: 15px; left: 15px; }
@@ -526,6 +551,18 @@
 
     <script>
         // ==================== ALL 78 ARTWORKS DATA ====================
+// ============================================
+// GITHUB IMAGE SOURCE CONFIGURATION
+// ============================================
+// Leave empty if images are in the same folder as this HTML file (GitHub Pages)
+const IMAGE_BASE_URL = '';
+//
+// OR use a subfolder (must end with /):
+// const IMAGE_BASE_URL = 'images/';
+//
+// OR use raw GitHub content URL (must end with /):
+// const IMAGE_BASE_URL = 'https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/';
+// ============================================
         const artworks = [
             { src: "Screenshot_20260608_130926_Instagram.jpg", title: "Calligraphy Collection", category: "Islamic Calligraphy", praise: "A stunning ensemble of divine words painted with such devotion! Each piece radiates spiritual warmth and artistic mastery." },
             { src: "Screenshot_20260608_130939_Instagram.jpg", title: "Watercolor Calligraphy Strips", category: "Islamic Calligraphy", praise: "The way watercolor blends with sacred verses is absolutely magical! Like poetry floating on clouds of color." },
@@ -637,10 +674,10 @@
                     <h2 class="category-title">${cat.title}</h2>
                     <p class="category-desc">${cat.desc} — ${filtered.length} artwork${filtered.length !== 1 ? 's' : ''}</p>
                     <div class="gallery-grid">
-                        ${filtered.map((art) => `
-                            <div class="art-card" onclick="openLightbox(${artworks.indexOf(art)})">
+                        ${filtered.map((art, i) => `
+                            <div class="art-card" onclick="openLightbox(${artworks.indexOf(art)})" style="animation-delay: ${i * 0.08}s">
                                 <div class="art-image-container loading">
-                                    <img src="${art.src}" alt="${art.title}" class="art-image" loading="lazy" 
+                                    <img src="${IMAGE_BASE_URL}${art.src}" alt="${art.title}" class="art-image" loading="lazy" 
                                         onerror="this.classList.add('error'); this.style.display='none';" 
                                         onload="this.parentElement.classList.remove('loading')">
                                     <div class="img-error"><div class="icon">🎨</div><div>${art.title}</div></div>
@@ -777,7 +814,7 @@
             document.getElementById('lightbox-category').textContent = art.category;
 
             setTimeout(() => {
-                lightboxImg.src = art.src;
+                lightboxImg.src = IMAGE_BASE_URL + art.src;
                 lightboxImg.alt = art.title;
                 lightboxImg.style.animation = 'zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             }, 10);
