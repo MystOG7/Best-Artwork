@@ -285,30 +285,103 @@
             z-index: 1000; justify-content: center; align-items: center;
             flex-direction: column; animation: fadeIn 0.3s ease;
             backdrop-filter: blur(20px);
+            overflow: hidden;
         }
         .lightbox.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .lightbox-img-container {
-            position: relative; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            padding: 0;
+
+        .lightbox-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: grab;
+            touch-action: none;
+        }
+        .lightbox-img-wrapper:active {
+            cursor: grabbing;
+        }
+        .lightbox-img-wrapper.is-zoomed {
+            cursor: grab;
         }
         .lightbox-img {
-            max-width: 100%; max-height: 100vh; width: 100%; height: 100vh;
+            max-width: 100%;
+            max-height: 100vh;
             object-fit: contain;
-            animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .lightbox-img.zoomed {
+            max-width: none;
+            max-height: none;
+            transition: none;
         }
         .lightbox-img.error { display: none; }
-        @keyframes zoomIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
+
+        .lightbox-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 1002;
+            background: rgba(26,11,46,0.8);
+            backdrop-filter: blur(20px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(123,44,191,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .lightbox-error {
-            display: none; color: white; flex-direction: column; align-items: center;
-            animation: zoomIn 0.4s ease;
+        .lightbox.active .lightbox-controls {
+            opacity: 1;
         }
-        .lightbox-error.active { display: flex; }
-        .lightbox-error .icon { font-size: 4rem; margin-bottom: 20px; }
+        .lightbox-controls:hover {
+            opacity: 1 !important;
+        }
+        .lb-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(123,44,191,0.5);
+            background: rgba(123,44,191,0.2);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .lb-btn:hover {
+            background: rgba(123,44,191,0.5);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(123,44,191,0.4);
+        }
+        .lb-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .lb-zoom-level {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            color: var(--lavender);
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+        }
+
         .lightbox-close {
             position: absolute; top: 20px; right: 20px;
             width: 48px; height: 48px; background: rgba(123,44,191,0.3);
@@ -321,9 +394,37 @@
             background: rgba(123,44,191,0.6); transform: rotate(90deg) scale(1.1);
             box-shadow: 0 0 20px rgba(123,44,191,0.5);
         }
+        .lightbox-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: rgba(26,11,46,0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(123,44,191,0.3);
+            max-width: 300px;
+        }
+        .lightbox-info h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--soft-purple);
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+        .lightbox-info p {
+            color: var(--lavender);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
 
         @media (max-width: 768px) {
             .lightbox-close { width: 42px; height: 42px; top: 15px; right: 15px; }
+            .lightbox-controls { bottom: 20px; padding: 8px 15px; gap: 8px; }
+            .lb-btn { width: 38px; height: 38px; font-size: 1rem; }
+            .lightbox-info { max-width: 200px; padding: 8px 12px; top: 15px; left: 15px; }
+            .lightbox-info h3 { font-size: 0.85rem; }
+            .lightbox-info p { font-size: 0.7rem; }
         }
 
         footer {
@@ -391,960 +492,30 @@
         </div>
     </nav>
 
-    <main>
-        <section id="all" class="category-section active">
-            <h2 class="category-title">All Artworks</h2>
-            <p class="category-desc">A beautiful collection of creativity, faith, and expression — 78 masterpieces</p>
-            <div class="gallery-grid">
-                <div class="art-card" onclick="openLightbox(0)" style="animation-delay: 0.0s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_130926_Instagram.jpg" alt="Calligraphy Collection" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Calligraphy Collection</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Calligraphy Collection</h3>
-                        <p class="art-praise">A stunning ensemble of divine words painted with such devotion! Each piece radiates spiritual warmth and artistic mastery. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(1)" style="animation-delay: 0.08s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_130939_Instagram.jpg" alt="Watercolor Calligraphy Strips" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Watercolor Calligraphy Strips</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Watercolor Calligraphy Strips</h3>
-                        <p class="art-praise">The way watercolor blends with sacred verses is absolutely magical! Like poetry floating on clouds of color. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(2)" style="animation-delay: 0.16s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_130951_Instagram.jpg" alt="Minar-e-Pakistan" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Minar-e-Pakistan</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Minar-e-Pakistan</h3>
-                        <p class="art-praise">Green and white perfection! The way you captured our beloved monument with such patriotic spirit is truly admirable. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Architecture</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(3)" style="animation-delay: 0.24s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131000_Instagram.jpg" alt="Serene Mountain Landscape" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Serene Mountain Landscape</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Serene Mountain Landscape</h3>
-                        <p class="art-praise">This landscape feels like a window to Jannah! The reflections in the water are so peaceful and beautifully done. <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(4)" style="animation-delay: 0.32s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131011_Instagram.jpg" alt="Palestine Awareness Poster" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Palestine Awareness Poster</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Palestine Awareness Poster</h3>
-                        <p class="art-praise">Art with a powerful message! Your voice through colors speaks volumes about justice, humanity, and compassion. <span class="heart">❤</span></p>
-                        <span class="category-tag">Awareness & Social Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(5)" style="animation-delay: 0.4s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131024_Instagram.jpg" alt="Anatomical Heart" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Anatomical Heart</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Anatomical Heart</h3>
-                        <p class="art-praise">The detail on this heart is incredible! You have such a steady hand and amazing understanding of anatomy. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(6)" style="animation-delay: 0.48s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131040_Instagram.jpg" alt="Moon Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Moon Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Moon Art</h3>
-                        <p class="art-praise">The moon looks so real and dreamy! Your shading technique captures the craters and glow perfectly. Simply mesmerizing! <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(7)" style="animation-delay: 0.56s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131106_Instagram.jpg" alt="Green Dome Mosque" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Green Dome Mosque</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Green Dome Mosque</h3>
-                        <p class="art-praise">The iconic green dome captured with such love and reverence! The sunset colors make it look even more heavenly. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Architecture</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(8)" style="animation-delay: 0.64s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131112_Instagram.jpg" alt="And He is With You Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>And He is With You Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">And He is With You Calligraphy</h3>
-                        <p class="art-praise">The roses frame this beautiful verse so elegantly! It feels like a warm hug from Allah through your art. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(9)" style="animation-delay: 0.72s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131117_Instagram.jpg" alt="Ya Hussain Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Ya Hussain Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Ya Hussain Calligraphy</h3>
-                        <p class="art-praise">The deep red background with the golden dome is so powerful and emotional! A beautiful tribute filled with love and respect. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(10)" style="animation-delay: 0.8s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131122_Instagram.jpg" alt="Hasbunallahu wa Ni'mal Wakeel" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Hasbunallahu wa Ni'mal Wakeel</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Hasbunallahu wa Ni'mal Wakeel</h3>
-                        <p class="art-praise">The keffiyeh border makes this so meaningful! A powerful reminder that Allah is sufficient, painted with such grace. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(11)" style="animation-delay: 0.88s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131131_Instagram.jpg" alt="La ilaha illallah" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>La ilaha illallah</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">La ilaha illallah</h3>
-                        <p class="art-praise">The golden calligraphy on dark green is absolutely majestic! This piece radiates the light of Tawheed in every stroke. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(12)" style="animation-delay: 0.96s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131139_Instagram.jpg" alt="Palestine Journal Spread" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Palestine Journal Spread</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Palestine Journal Spread</h3>
-                        <p class="art-praise">The watermelon flag design is so creative! Combined with the beautiful floral calligraphy, this spread is pure art with purpose. <span class="heart">❤</span></p>
-                        <span class="category-tag">Awareness & Social Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(13)" style="animation-delay: 1.04s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131153_Instagram.jpg" alt="Kaaba & Green Dome Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Kaaba & Green Dome Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Kaaba & Green Dome Cards</h3>
-                        <p class="art-praise">Two holy places in one beautiful frame! The watercolor washes give such a soft, spiritual glow to both sacred sites. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Architecture</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(14)" style="animation-delay: 1.12s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131206_Instagram.jpg" alt="Mosque-Shaped Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Mosque-Shaped Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Mosque-Shaped Calligraphy</h3>
-                        <p class="art-praise">The way you shaped the calligraphy into a mosque silhouette is pure genius! Such creative and devoted artistry. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(15)" style="animation-delay: 1.2s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131213_Instagram.jpg" alt="Allah on Tree Bark" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Allah on Tree Bark</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Allah on Tree Bark</h3>
-                        <p class="art-praise">Nature meets divine art! The rustic tree bark canvas with the powerful name of Allah is so unique and deeply moving. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(16)" style="animation-delay: 1.28s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131221_Instagram.jpg" alt="Candle & Flower Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Candle & Flower Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Candle & Flower Calligraphy</h3>
-                        <p class="art-praise">The glowing candle and the radiant flower calligraphy together create such a warm, spiritual atmosphere. Beautifully balanced! <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(17)" style="animation-delay: 1.36s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131226_Instagram.jpg" alt="Dome Under the Moonlight" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Dome Under the Moonlight</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Dome Under the Moonlight</h3>
-                        <p class="art-praise">The night sky with the glowing moon and the sacred green dome is simply breathtaking! A dreamy piece full of barakah. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Architecture</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(18)" style="animation-delay: 1.44s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131232_Instagram.jpg" alt="Surah Duha Journal - Stars" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Duha Journal - Stars</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Duha Journal - Stars</h3>
-                        <p class="art-praise">The starry night theme for Surah Duha is so fitting! Your journal spreads are educational and stunningly beautiful at the same time. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(19)" style="animation-delay: 1.52s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131243_Instagram.jpg" alt="Surah Duha Journal - Roses" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Duha Journal - Roses</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Duha Journal - Roses</h3>
-                        <p class="art-praise">The roses and torn paper aesthetic is so artistic! This journal page feels like a warm, hopeful embrace. Simply lovely! <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(20)" style="animation-delay: 1.6s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131300_Instagram.jpg" alt="Elegant Quranic Reminders" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Elegant Quranic Reminders</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Elegant Quranic Reminders</h3>
-                        <p class="art-praise">Beautiful handwritten reminders filled with soothing verses. Such meticulous and thoughtful work! <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Reminders</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(21)" style="animation-delay: 1.68s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131306_Instagram.jpg" alt="Premium Reminder Collection" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Premium Reminder Collection</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Premium Reminder Collection</h3>
-                        <p class="art-praise">The sophisticated borders and vibrant text elevate these verses into a truly premium collection of daily spiritual boosts. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Reminders</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(22)" style="animation-delay: 1.76s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131328_Instagram.jpg" alt="Surah Duha Floral Spread" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Duha Floral Spread</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Duha Floral Spread</h3>
-                        <p class="art-praise">The intricate floral borders framing Surah Duha are absolutely gorgeous. A masterpiece of dedication and patience! <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(23)" style="animation-delay: 1.84s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131334_Instagram.jpg" alt="Sujood at Sunset" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sujood at Sunset</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sujood at Sunset</h3>
-                        <p class="art-praise">A deeply moving painting capturing the peace of prayer amidst a breathtaking sunset. So atmospheric! <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(24)" style="animation-delay: 1.92s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131342_Instagram.jpg" alt="Sunflower Hardship & Ease" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sunflower Hardship & Ease</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sunflower Hardship & Ease</h3>
-                        <p class="art-praise">Bright sunflowers bringing the verse 'With hardship comes ease' to life. Such a cheerful and comforting piece! <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(25)" style="animation-delay: 2.0s">
-                    <div class="art-image-container">
-                        <img src="Screenshot_20260608_131252_Instagram.jpg" alt="Starry Night Islamic Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Starry Night Islamic Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Starry Night Islamic Journal</h3>
-                        <p class="art-praise">A brilliant fusion of Van Gogh's style with sacred Islamic journaling. Truly a creative masterpiece! <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(26)" style="animation-delay: 2.08s">
-                    <div class="art-image-container">
-                        <img src="Snapchat-1470198826(1).jpg" alt="Mystic Purple Moon" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Mystic Purple Moon</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Mystic Purple Moon</h3>
-                        <p class="art-praise">The swirling purples and blues inside this moon create such a dreamy, mystical vibe. Beautifully shaded! <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(27)" style="animation-delay: 2.16s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_132714_138.jpg" alt="Dervish Spirituality Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Dervish Spirituality Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Dervish Spirituality Journal</h3>
-                        <p class="art-praise">An abstract and profound expression of faith. The whirling dervish alongside elegant calligraphy makes this page echo with deep spirituality. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(28)" style="animation-delay: 2.24s">
-                    <div class="art-image-container">
-                        <img src="Snapchat-705301948.jpg" alt="Cosmic Garden Painting" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Cosmic Garden Painting</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Cosmic Garden Painting</h3>
-                        <p class="art-praise">A breathtaking cosmic garden with swirling galaxies, cherry blossoms, and a mystical UFO beam! The colors are absolutely out of this world! <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(29)" style="animation-delay: 2.32s">
-                    <div class="art-image-container">
-                        <img src="Snapchat-1497800412.jpg" alt="Iridescent Eye on Grass" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Iridescent Eye on Grass</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Iridescent Eye on Grass</h3>
-                        <p class="art-praise">The way you captured the iridescent blue eye against the natural grass background is so striking! Nature meets surreal beauty. <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(30)" style="animation-delay: 2.4s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153459_462.jpg" alt="Mosque Architecture Sketch" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Mosque Architecture Sketch</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Mosque Architecture Sketch</h3>
-                        <p class="art-praise">Your architectural sketch of the mosque shows such precision and understanding of Islamic design! The pencil work is beautifully detailed. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Architecture</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(31)" style="animation-delay: 2.48s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153500_951.jpg" alt="Arabic Calligraphy on Pink" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Arabic Calligraphy on Pink</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Arabic Calligraphy on Pink</h3>
-                        <p class="art-praise">The soft pink watercolor wash behind the bold Arabic calligraphy creates such a gentle yet powerful contrast. So elegant! <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(32)" style="animation-delay: 2.56s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153502_427.jpg" alt="Palestine Solidarity Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Palestine Solidarity Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Palestine Solidarity Art</h3>
-                        <p class="art-praise">A powerful piece of solidarity art! The watermelon colors and the keffiyeh pattern speak so loudly for justice and freedom. <span class="heart">❤</span></p>
-                        <span class="category-tag">Awareness & Social Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(33)" style="animation-delay: 2.64s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153503_773.jpg" alt="Anime Eyes Sketch" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Anime Eyes Sketch</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Anime Eyes Sketch</h3>
-                        <p class="art-praise">Those anime eyes are drawn with such expressive detail! The purple shading gives them such a magical, soulful depth. <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(34)" style="animation-delay: 2.72s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153505_004.jpg" alt="Beautiful Eyes, Beautiful Soul" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Beautiful Eyes, Beautiful Soul</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Beautiful Eyes, Beautiful Soul</h3>
-                        <p class="art-praise">What a meaningful piece! The realistic eye paired with the heartfelt message shows both your artistic and emotional depth. <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(35)" style="animation-delay: 2.8s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153506_986.jpg" alt="Defying Fate Together" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Defying Fate Together</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Defying Fate Together</h3>
-                        <p class="art-praise">The romantic message paired with those beautifully drawn eyes creates such an intimate, touching artwork. So full of emotion! <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(36)" style="animation-delay: 2.88s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153508_569.jpg" alt="Eyes Are Windows of the Soul" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Eyes Are Windows of the Soul</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Eyes Are Windows of the Soul</h3>
-                        <p class="art-praise">The Arabic proverb 'Eyes are the windows of the soul' paired with these stunningly realistic eyes is pure poetic perfection! <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(37)" style="animation-delay: 2.96s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153510_386.jpg" alt="Rainbow Beach Sunset" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Rainbow Beach Sunset</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Rainbow Beach Sunset</h3>
-                        <p class="art-praise">A vibrant rainbow over a dreamy beach sunset! The palm silhouettes and colorful sky create such a tropical paradise vibe. <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(38)" style="animation-delay: 3.04s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153519_921.jpg" alt="Enchanted Forest Stream" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Enchanted Forest Stream</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Enchanted Forest Stream</h3>
-                        <p class="art-praise">This enchanted forest with the flowing stream and wildflowers feels like a fairy tale come to life! So peaceful and magical. <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(39)" style="animation-delay: 3.12s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153521_537.jpg" alt="Sunset Calligraphy Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sunset Calligraphy Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sunset Calligraphy Art</h3>
-                        <p class="art-praise">The bold Arabic calligraphy against the warm sunset gradient is absolutely stunning! The colors blend so beautifully with the sacred words. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(40)" style="animation-delay: 3.2s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153529_186.jpg" alt="Tulip & Bismillah Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Tulip & Bismillah Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Tulip & Bismillah Art</h3>
-                        <p class="art-praise">The colorful tulips framing the beautiful Bismillah calligraphy create such a fresh, spring-like spiritual feeling. Gorgeous composition! <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(41)" style="animation-delay: 3.28s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153530_639.jpg" alt="Surah Al-Ikhlas Journal Page" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Al-Ikhlas Journal Page</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Al-Ikhlas Journal Page</h3>
-                        <p class="art-praise">Your Surah Al-Ikhlas journal spread is so educational and beautifully organized! The color-coded notes make learning so inviting. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(42)" style="animation-delay: 3.36s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153531_913.jpg" alt="Surah Al-Falaq Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Al-Falaq Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Al-Falaq Journal</h3>
-                        <p class="art-praise">The creative doodles and colorful accents around Surah Al-Falaq make this journal page so lively and engaging! Beautiful work! <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(43)" style="animation-delay: 3.44s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153535_675.jpg" alt="Surah An-Nas Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah An-Nas Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah An-Nas Journal</h3>
-                        <p class="art-praise">The green-themed Surah An-Nas journal page with the money border design is so creative! A perfect blend of art and faith. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(44)" style="animation-delay: 3.52s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153537_137.jpg" alt="Surah Al-Kafirun Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Al-Kafirun Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Al-Kafirun Journal</h3>
-                        <p class="art-praise">The pink and purple watercolor splashes around Surah Al-Kafirun create such a vibrant, joyful learning atmosphere! Simply lovely! <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(45)" style="animation-delay: 3.6s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153538_463.jpg" alt="Surah Al-Kawthar Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Al-Kawthar Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Al-Kawthar Journal</h3>
-                        <p class="art-praise">The blue water-themed Surah Al-Kawthar page is so fitting! The fountain illustration beautifully represents the abundance of Allah's blessings. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(46)" style="animation-delay: 3.68s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153541_537.jpg" alt="Colorful Ramadan Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Colorful Ramadan Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Colorful Ramadan Cards</h3>
-                        <p class="art-praise">A delightful collection of colorful Ramadan Mubarak cards! Each one is uniquely designed with such festive creativity and love. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(47)" style="animation-delay: 3.76s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153553_039.jpg" alt="Red & Gold Ramadan Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Red & Gold Ramadan Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Red & Gold Ramadan Cards</h3>
-                        <p class="art-praise">The red and gold Ramadan card collection is so elegant and celebratory! The mosque silhouettes add such a beautiful traditional touch. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(48)" style="animation-delay: 3.84s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153603_086.jpg" alt="Pink Ramadan Cards Collection" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Pink Ramadan Cards Collection</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Pink Ramadan Cards Collection</h3>
-                        <p class="art-praise">These adorable pink Ramadan Mubarak cards are so sweet and festive! Each tiny card is a little masterpiece of love and celebration. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(49)" style="animation-delay: 3.92s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153604_569.jpg" alt="Blue & Pink Ramadan Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Blue & Pink Ramadan Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Blue & Pink Ramadan Cards</h3>
-                        <p class="art-praise">The combination of blue and pink with beautiful mosque silhouettes creates such a harmonious Ramadan greeting collection! Simply lovely! <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(50)" style="animation-delay: 4.0s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153607_695.jpg" alt="Minimalist Blue Ramadan Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Minimalist Blue Ramadan Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Minimalist Blue Ramadan Cards</h3>
-                        <p class="art-praise">The minimalist blue Ramadan cards with elegant mosque designs show such refined taste! Less is truly more in this beautiful set. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(51)" style="animation-delay: 4.08s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153609_292.jpg" alt="Floral Ramadan in Advance Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Floral Ramadan in Advance Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Floral Ramadan in Advance Cards</h3>
-                        <p class="art-praise">The floral 'Ramadan Mubarak in advance' cards are so thoughtful and beautifully decorated! The watercolor flowers add such a delicate charm. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(52)" style="animation-delay: 4.16s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153614_861.jpg" alt="Purple & Pink Ramadan Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Purple & Pink Ramadan Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Purple & Pink Ramadan Cards</h3>
-                        <p class="art-praise">The purple and pink gradient Ramadan cards with crescent moons are absolutely gorgeous! Such a dreamy color palette for blessed greetings. <span class="heart">❤</span></p>
-                        <span class="category-tag">Ramadan Cards</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(53)" style="animation-delay: 4.24s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153616_136.jpg" alt="Surah Baqarah Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Surah Baqarah Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Surah Baqarah Calligraphy</h3>
-                        <p class="art-praise">The magnificent Surah Baqarah calligraphy with ornate geometric borders is absolutely breathtaking! Such devotion in every stroke. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(54)" style="animation-delay: 4.32s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153617_878.jpg" alt="Ar-Rahman Gold Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Ar-Rahman Gold Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Ar-Rahman Gold Calligraphy</h3>
-                        <p class="art-praise">The golden Ar-Rahman calligraphy against the blue geometric patterns is so regal and divine! A true masterpiece of Islamic art. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(55)" style="animation-delay: 4.4s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153620_912.jpg" alt="Dua, Sabr & Shukr Floral Cards" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Dua, Sabr & Shukr Floral Cards</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Dua, Sabr & Shukr Floral Cards</h3>
-                        <p class="art-praise">These three floral calligraphy cards for Dua, Sabr, and Shukr are so elegant! The roses intertwined with sacred words create pure beauty. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(56)" style="animation-delay: 4.48s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153639_988.jpg" alt="Sabr on Rainbow Watercolor" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sabr on Rainbow Watercolor</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sabr on Rainbow Watercolor</h3>
-                        <p class="art-praise">The word 'Sabr' on a vibrant rainbow watercolor background is so uplifting! A beautiful reminder that patience brings colorful blessings. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(57)" style="animation-delay: 4.56s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153700_888.jpg" alt="Salamun Qaulan Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Salamun Qaulan Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Salamun Qaulan Calligraphy</h3>
-                        <p class="art-praise">The graceful 'Salamun qaulan min Rabbin raheem' with delicate flower vases is so peaceful! It radiates divine tranquility in every letter. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(58)" style="animation-delay: 4.64s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153730_893.jpg" alt="Importance of Salah Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Importance of Salah Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Importance of Salah Journal</h3>
-                        <p class="art-praise">The 'Importance of Salah' journal page with the praying figure is so educational and heartwarming! A beautiful reminder of our daily connection with Allah. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(59)" style="animation-delay: 4.72s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153732_491.jpg" alt="Salah Benefits Mosaic Journal" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Salah Benefits Mosaic Journal</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Salah Benefits Mosaic Journal</h3>
-                        <p class="art-praise">The detailed Salah benefits journal with the stunning blue mosaic border is absolutely magnificent! Such creative and informative Islamic art. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(60)" style="animation-delay: 4.8s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153733_935.jpg" alt="Improve Your Salah Guide" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Improve Your Salah Guide</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Improve Your Salah Guide</h3>
-                        <p class="art-praise">The 'Improve Your Salah' guide with practical tips in both Urdu and English is so helpful and beautifully designed! A true labor of love. <span class="heart">❤</span></p>
-                        <span class="category-tag">Quranic Journal Art</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(61)" style="animation-delay: 4.88s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153735_740.jpg" alt="Sunflower Watercolor Painting" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sunflower Watercolor Painting</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sunflower Watercolor Painting</h3>
-                        <p class="art-praise">These sunflowers painted in watercolor are so bright and cheerful! The way you captured their golden petals against the blue sky is simply delightful. <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(62)" style="animation-delay: 4.96s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153737_351.jpg" alt="Tulip Colored Pencil Drawing" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Tulip Colored Pencil Drawing</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Tulip Colored Pencil Drawing</h3>
-                        <p class="art-praise">The tulip drawing in colored pencil shows such amazing detail and shading! The pink and white flowers look almost real. Stunning botanical art! <span class="heart">❤</span></p>
-                        <span class="category-tag">Nature & Landscapes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(63)" style="animation-delay: 5.04s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153739_018.jpg" alt="Disenthal Freedom Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Disenthal Freedom Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Disenthal Freedom Art</h3>
-                        <p class="art-praise">The conceptual 'Disenthal Freedom' art with the handprint and spider web is so thought-provoking! A powerful piece about breaking free from illusions. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(64)" style="animation-delay: 5.12s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153740_401.jpg" alt="Space Popup Book" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Space Popup Book</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Space Popup Book</h3>
-                        <p class="art-praise">The space-themed popup book with planets, rocket, and asteroids is absolutely incredible! Such creative 3D paper engineering and cosmic imagination. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(65)" style="animation-delay: 5.2s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153741_893.jpg" alt="Tangled Lanterns Scene" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Tangled Lanterns Scene</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Tangled Lanterns Scene</h3>
-                        <p class="art-praise">The Tangled-inspired lantern scene with the castle and boat is so romantic and magical! The floating lights create such a dreamy atmosphere. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(66)" style="animation-delay: 5.28s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153743_826.jpg" alt="Hand-Painted Sunflower Pen Holder" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Hand-Painted Sunflower Pen Holder</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Hand-Painted Sunflower Pen Holder</h3>
-                        <p class="art-praise">The hand-painted sunflower pen holder is such a practical work of art! Turning everyday objects into beautiful canvases shows true artistic spirit. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(67)" style="animation-delay: 5.36s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153745_793.jpg" alt="Anime Portrait with Hat" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Anime Portrait with Hat</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Anime Portrait with Hat</h3>
-                        <p class="art-praise">The anime-style portrait with the stylish hat is so cool and expressive! The orange hair and confident pose capture such vibrant personality. <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(68)" style="animation-delay: 5.44s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153759_903.jpg" alt="Fa Inna Ma'al Usri Yusra - Pink Mosque Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Fa Inna Ma'al Usri Yusra - Pink Mosque Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Fa Inna Ma'al Usri Yusra - Pink Mosque Art</h3>
-                        <p class="art-praise">A gorgeous pink watercolor piece with the beautiful verse 'With hardship comes ease' surrounded by mosque domes and stars. The color palette is so soothing and spiritually uplifting! <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(69)" style="animation-delay: 5.52s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153802_545.jpg" alt="99 Names of Allah Colorful Grid" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>99 Names of Allah Colorful Grid</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">99 Names of Allah Colorful Grid</h3>
-                        <p class="art-praise">A stunning grid of Allah's 99 names painted in vibrant watercolor squares! Each name is written with such precision and love. The golden borders add such a beautiful finishing touch. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(70)" style="animation-delay: 5.6s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153804_712.jpg" alt="Latifun Khabir Gold Calligraphy" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Latifun Khabir Gold Calligraphy</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Latifun Khabir Gold Calligraphy</h3>
-                        <p class="art-praise">The golden Arabic calligraphy on a dark mystical background with intricate floral patterns is absolutely regal! The contrast between the gold and deep colors creates such a divine atmosphere. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(71)" style="animation-delay: 5.68s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153811_271.jpg" alt="Excellent Reward for Righteous Workers" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Excellent Reward for Righteous Workers</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Excellent Reward for Righteous Workers</h3>
-                        <p class="art-praise">The watercolor roses and soft green background make this Quranic verse from Surah Al-Ankabut so inviting! The English translation paired with elegant Arabic is beautifully balanced. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(72)" style="animation-delay: 5.76s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153827_720.jpg" alt="Sunflower Verse Art" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Sunflower Verse Art</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Sunflower Verse Art</h3>
-                        <p class="art-praise">A bright sunflower bursting with the verse 'So remember Me, I will remember you'! The cheerful yellow against the turquoise background is so refreshing and joyful. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(73)" style="animation-delay: 5.84s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153830_263.jpg" alt="Rose Silhouette in Hand" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Rose Silhouette in Hand</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Rose Silhouette in Hand</h3>
-                        <p class="art-praise">A dramatic black silhouette of a hand holding a rose against a warm beige background! The contrast and simplicity create such a powerful, romantic visual. Truly elegant! <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(74)" style="animation-delay: 5.92s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153831_869.jpg" alt="Naruto Character Collage" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Naruto Character Collage</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Naruto Character Collage</h3>
-                        <p class="art-praise">An amazing collection of Naruto characters drawn with such vibrant colors! The way you captured each character's unique style and personality is absolutely fantastic. Anime fan art at its best! <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(75)" style="animation-delay: 6.0s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153833_704.jpg" alt="Traditional Sari Portrait" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Traditional Sari Portrait</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Traditional Sari Portrait</h3>
-                        <p class="art-praise">A beautiful portrait of a woman in a colorful traditional sari against a soft pink background! The intricate patterns on the sari and the graceful pose show such cultural appreciation and artistic skill. <span class="heart">❤</span></p>
-                        <span class="category-tag">Portraits & Eyes</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(76)" style="animation-delay: 6.08s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153835_187.jpg" alt="Noor Ki Dua - Handwritten Prayer" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Noor Ki Dua - Handwritten Prayer</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Noor Ki Dua - Handwritten Prayer</h3>
-                        <p class="art-praise">A heartfelt handwritten dua in beautiful Urdu calligraphy with red accents! The personal touch and devotion in every word makes this piece so special and spiritually moving. <span class="heart">❤</span></p>
-                        <span class="category-tag">Islamic Calligraphy</span>
-                    </div>
-                </div>
-                <div class="art-card" onclick="openLightbox(77)" style="animation-delay: 6.16s">
-                    <div class="art-image-container">
-                        <img src="IMG_20260608_153838_529.jpg" alt="Pixel Sunset Cityscape" class="art-image" loading="lazy" onerror="this.classList.add('error'); this.style.display='none';" onload="this.parentElement.classList.remove('loading')">
-                        <div class="img-error"><div class="icon">🎨</div><div>Pixel Sunset Cityscape</div></div>
-                        <div class="expand-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg></div>
-                    </div>
-                    <div class="art-info">
-                        <h3 class="art-title">Pixel Sunset Cityscape</h3>
-                        <p class="art-praise">A creative pixel-art style cityscape at sunset with beautiful color blocking! The way you blended warm oranges and cool blues creates such a modern, digital-art aesthetic. So innovative! <span class="heart">❤</span></p>
-                        <span class="category-tag">Other Artworks</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+    <main id="gallery-main">
+        <!-- Sections will be generated by JavaScript -->
     </main>
 
     <div class="lightbox" id="lightbox">
         <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-        <div class="lightbox-img-container">
+        <div class="lightbox-info" id="lightbox-info">
+            <h3 id="lightbox-title"></h3>
+            <p id="lightbox-category"></p>
+        </div>
+        <div class="lightbox-img-wrapper" id="lightbox-wrapper">
             <img src="" alt="" class="lightbox-img" id="lightbox-img" onerror="this.classList.add('error'); document.getElementById('lightbox-error').classList.add('active');">
-            <div class="lightbox-error" id="lightbox-error">
-                <div class="icon">🎨</div>
-                <div>Image not found</div>
-            </div>
+        </div>
+        <div class="lightbox-error" id="lightbox-error">
+            <div class="icon">🎨</div>
+            <div>Image not found</div>
+        </div>
+        <div class="lightbox-controls">
+            <button class="lb-btn" onclick="zoomOut()" id="zoom-out" title="Zoom Out">−</button>
+            <span class="lb-zoom-level" id="zoom-level">100%</span>
+            <button class="lb-btn" onclick="zoomIn()" id="zoom-in" title="Zoom In">+</button>
+            <button class="lb-btn" onclick="resetZoom()" id="zoom-reset" title="Reset Zoom" style="font-size: 0.8rem;">⟲</button>
+            <button class="lb-btn" onclick="prevImage()" title="Previous">←</button>
+            <button class="lb-btn" onclick="nextImage()" title="Next">→</button>
         </div>
     </div>
 
@@ -1354,7 +525,146 @@
     </footer>
 
     <script>
-        // Particle animation
+        // ==================== DATA ====================
+        const artworks = [
+            { src: "Screenshot_20260608_130926_Instagram.jpg", title: "Calligraphy Collection", category: "Islamic Calligraphy", praise: "A stunning ensemble of divine words painted with such devotion! Each piece radiates spiritual warmth and artistic mastery." },
+            { src: "Screenshot_20260608_130939_Instagram.jpg", title: "Watercolor Calligraphy Strips", category: "Islamic Calligraphy", praise: "The way watercolor blends with sacred verses is absolutely magical! Like poetry floating on clouds of color." },
+            { src: "Screenshot_20260608_130951_Instagram.jpg", title: "Minar-e-Pakistan", category: "Islamic Architecture", praise: "Green and white perfection! The way you captured our beloved monument with such patriotic spirit is truly admirable." },
+            { src: "Screenshot_20260608_131000_Instagram.jpg", title: "Serene Mountain Landscape", category: "Nature & Landscapes", praise: "This landscape feels like a window to Jannah! The reflections in the water are so peaceful and beautifully done." },
+            { src: "Screenshot_20260608_131011_Instagram.jpg", title: "Palestine Awareness Poster", category: "Awareness & Social Art", praise: "Art with a powerful message! Your voice through colors speaks volumes about justice, humanity, and compassion." },
+            { src: "Screenshot_20260608_131024_Instagram.jpg", title: "Anatomical Heart", category: "Other Artworks", praise: "The detail on this heart is incredible! You have such a steady hand and amazing understanding of anatomy." },
+            { src: "Screenshot_20260608_131040_Instagram.jpg", title: "Moon Art", category: "Nature & Landscapes", praise: "The moon looks so real and dreamy! Your shading technique captures the craters and glow perfectly. Simply mesmerizing!" },
+            { src: "Screenshot_20260608_131106_Instagram.jpg", title: "Green Dome Mosque", category: "Islamic Architecture", praise: "The iconic green dome captured with such love and reverence! The sunset colors make it look even more heavenly." },
+            { src: "Screenshot_20260608_131112_Instagram.jpg", title: "And He is With You Calligraphy", category: "Islamic Calligraphy", praise: "The roses frame this beautiful verse so elegantly! It feels like a warm hug from Allah through your art." },
+            { src: "Screenshot_20260608_131117_Instagram.jpg", title: "Ya Hussain Calligraphy", category: "Islamic Calligraphy", praise: "The deep red background with the golden dome is so powerful and emotional! A beautiful tribute filled with love and respect." },
+            { src: "Screenshot_20260608_131122_Instagram.jpg", title: "Hasbunallahu wa Ni'mal Wakeel", category: "Islamic Calligraphy", praise: "The keffiyeh border makes this so meaningful! A powerful reminder that Allah is sufficient, painted with such grace." },
+            { src: "Screenshot_20260608_131131_Instagram.jpg", title: "La ilaha illallah", category: "Islamic Calligraphy", praise: "The golden calligraphy on dark green is absolutely majestic! This piece radiates the light of Tawheed in every stroke." },
+            { src: "Screenshot_20260608_131139_Instagram.jpg", title: "Palestine Journal Spread", category: "Awareness & Social Art", praise: "The watermelon flag design is so creative! Combined with the beautiful floral calligraphy, this spread is pure art with purpose." },
+            { src: "Screenshot_20260608_131153_Instagram.jpg", title: "Kaaba & Green Dome Cards", category: "Islamic Architecture", praise: "Two holy places in one beautiful frame! The watercolor washes give such a soft, spiritual glow to both sacred sites." },
+            { src: "Screenshot_20260608_131206_Instagram.jpg", title: "Mosque-Shaped Calligraphy", category: "Islamic Calligraphy", praise: "The way you shaped the calligraphy into a mosque silhouette is pure genius! Such creative and devoted artistry." },
+            { src: "Screenshot_20260608_131213_Instagram.jpg", title: "Allah on Tree Bark", category: "Islamic Calligraphy", praise: "Nature meets divine art! The rustic tree bark canvas with the powerful name of Allah is so unique and deeply moving." },
+            { src: "Screenshot_20260608_131221_Instagram.jpg", title: "Candle & Flower Calligraphy", category: "Islamic Calligraphy", praise: "The glowing candle and the radiant flower calligraphy together create such a warm, spiritual atmosphere. Beautifully balanced!" },
+            { src: "Screenshot_20260608_131226_Instagram.jpg", title: "Dome Under the Moonlight", category: "Islamic Architecture", praise: "The night sky with the glowing moon and the sacred green dome is simply breathtaking! A dreamy piece full of barakah." },
+            { src: "Screenshot_20260608_131232_Instagram.jpg", title: "Surah Duha Journal - Stars", category: "Quranic Journal Art", praise: "The starry night theme for Surah Duha is so fitting! Your journal spreads are educational and stunningly beautiful at the same time." },
+            { src: "Screenshot_20260608_131243_Instagram.jpg", title: "Surah Duha Journal - Roses", category: "Quranic Journal Art", praise: "The roses and torn paper aesthetic is so artistic! This journal page feels like a warm, hopeful embrace. Simply lovely!" },
+            { src: "Screenshot_20260608_131252_Instagram.jpg", title: "Elegant Quranic Reminders", category: "Islamic Reminders", praise: "Beautiful handwritten reminders filled with soothing verses. Such meticulous and thoughtful work!" },
+            { src: "Screenshot_20260608_131300_Instagram.jpg", title: "Premium Reminder Collection", category: "Islamic Reminders", praise: "The sophisticated borders and vibrant text elevate these verses into a truly premium collection of daily spiritual boosts." },
+            { src: "Screenshot_20260608_131306_Instagram.jpg", title: "Surah Duha Floral Spread", category: "Quranic Journal Art", praise: "The intricate floral borders framing Surah Duha are absolutely gorgeous. A masterpiece of dedication and patience!" },
+            { src: "Screenshot_20260608_131328_Instagram.jpg", title: "Sujood at Sunset", category: "Nature & Landscapes", praise: "A deeply moving painting capturing the peace of prayer amidst a breathtaking sunset. So atmospheric!" },
+            { src: "Screenshot_20260608_131334_Instagram.jpg", title: "Sunflower Hardship & Ease", category: "Nature & Landscapes", praise: "Bright sunflowers bringing the verse 'With hardship comes ease' to life. Such a cheerful and comforting piece!" },
+            { src: "Screenshot_20260608_131342_Instagram.jpg", title: "Starry Night Islamic Journal", category: "Quranic Journal Art", praise: "A brilliant fusion of Van Gogh's style with sacred Islamic journaling. Truly a creative masterpiece!" },
+            { src: "Snapchat-1470198826(1).jpg", title: "Mystic Purple Moon", category: "Other Artworks", praise: "The swirling purples and blues inside this moon create such a dreamy, mystical vibe. Beautifully shaded!" },
+            { src: "IMG_20260608_132714_138.jpg", title: "Dervish Spirituality Journal", category: "Quranic Journal Art", praise: "An abstract and profound expression of faith. The whirling dervish alongside elegant calligraphy makes this page echo with deep spirituality." },
+            { src: "Snapchat-705301948.jpg", title: "Cosmic Garden Painting", category: "Other Artworks", praise: "A breathtaking cosmic garden with swirling galaxies, cherry blossoms, and a mystical UFO beam! The colors are absolutely out of this world!" },
+            { src: "Snapchat-1497800412.jpg", title: "Iridescent Eye on Grass", category: "Portraits & Eyes", praise: "The way you captured the iridescent blue eye against the natural grass background is so striking! Nature meets surreal beauty." },
+            { src: "IMG_20260608_153459_462.jpg", title: "Mosque Architecture Sketch", category: "Islamic Architecture", praise: "Your architectural sketch of the mosque shows such precision and understanding of Islamic design! The pencil work is beautifully detailed." },
+            { src: "IMG_20260608_153500_951.jpg", title: "Arabic Calligraphy on Pink", category: "Islamic Calligraphy", praise: "The soft pink watercolor wash behind the bold Arabic calligraphy creates such a gentle yet powerful contrast. So elegant!" },
+            { src: "IMG_20260608_153502_427.jpg", title: "Palestine Solidarity Art", category: "Awareness & Social Art", praise: "A powerful piece of solidarity art! The watermelon colors and the keffiyeh pattern speak so loudly for justice and freedom." },
+            { src: "IMG_20260608_153503_773.jpg", title: "Anime Eyes Sketch", category: "Portraits & Eyes", praise: "Those anime eyes are drawn with such expressive detail! The purple shading gives them such a magical, soulful depth." },
+            { src: "IMG_20260608_153505_004.jpg", title: "Beautiful Eyes, Beautiful Soul", category: "Portraits & Eyes", praise: "What a meaningful piece! The realistic eye paired with the heartfelt message shows both your artistic and emotional depth." },
+            { src: "IMG_20260608_153506_986.jpg", title: "Defying Fate Together", category: "Portraits & Eyes", praise: "The romantic message paired with those beautifully drawn eyes creates such an intimate, touching artwork. So full of emotion!" },
+            { src: "IMG_20260608_153508_569.jpg", title: "Eyes Are Windows of the Soul", category: "Portraits & Eyes", praise: "The Arabic proverb 'Eyes are the windows of the soul' paired with these stunningly realistic eyes is pure poetic perfection!" },
+            { src: "IMG_20260608_153510_386.jpg", title: "Rainbow Beach Sunset", category: "Nature & Landscapes", praise: "A vibrant rainbow over a dreamy beach sunset! The palm silhouettes and colorful sky create such a tropical paradise vibe." },
+            { src: "IMG_20260608_153519_921.jpg", title: "Enchanted Forest Stream", category: "Nature & Landscapes", praise: "This enchanted forest with the flowing stream and wildflowers feels like a fairy tale come to life! So peaceful and magical." },
+            { src: "IMG_20260608_153521_537.jpg", title: "Sunset Calligraphy Art", category: "Islamic Calligraphy", praise: "The bold Arabic calligraphy against the warm sunset gradient is absolutely stunning! The colors blend so beautifully with the sacred words." },
+            { src: "IMG_20260608_153529_186.jpg", title: "Tulip & Bismillah Art", category: "Islamic Calligraphy", praise: "The colorful tulips framing the beautiful Bismillah calligraphy create such a fresh, spring-like spiritual feeling. Gorgeous composition!" },
+            { src: "IMG_20260608_153530_639.jpg", title: "Surah Al-Ikhlas Journal Page", category: "Quranic Journal Art", praise: "Your Surah Al-Ikhlas journal spread is so educational and beautifully organized! The color-coded notes make learning so inviting." },
+            { src: "IMG_20260608_153531_913.jpg", title: "Surah Al-Falaq Journal", category: "Quranic Journal Art", praise: "The creative doodles and colorful accents around Surah Al-Falaq make this journal page so lively and engaging! Beautiful work!" },
+            { src: "IMG_20260608_153535_675.jpg", title: "Surah An-Nas Journal", category: "Quranic Journal Art", praise: "The green-themed Surah An-Nas journal page with the money border design is so creative! A perfect blend of art and faith." },
+            { src: "IMG_20260608_153537_137.jpg", title: "Surah Al-Kafirun Journal", category: "Quranic Journal Art", praise: "The pink and purple watercolor splashes around Surah Al-Kafirun create such a vibrant, joyful learning atmosphere! Simply lovely!" },
+            { src: "IMG_20260608_153538_463.jpg", title: "Surah Al-Kawthar Journal", category: "Quranic Journal Art", praise: "The blue water-themed Surah Al-Kawthar page is so fitting! The fountain illustration beautifully represents the abundance of Allah's blessings." },
+            { src: "IMG_20260608_153541_537.jpg", title: "Colorful Ramadan Cards", category: "Ramadan Cards", praise: "A delightful collection of colorful Ramadan Mubarak cards! Each one is uniquely designed with such festive creativity and love." },
+            { src: "IMG_20260608_153553_039.jpg", title: "Red & Gold Ramadan Cards", category: "Ramadan Cards", praise: "The red and gold Ramadan card collection is so elegant and celebratory! The mosque silhouettes add such a beautiful traditional touch." },
+            { src: "IMG_20260608_153603_086.jpg", title: "Pink Ramadan Cards Collection", category: "Ramadan Cards", praise: "These adorable pink Ramadan Mubarak cards are so sweet and festive! Each tiny card is a little masterpiece of love and celebration." },
+            { src: "IMG_20260608_153604_569.jpg", title: "Blue & Pink Ramadan Cards", category: "Ramadan Cards", praise: "The combination of blue and pink with beautiful mosque silhouettes creates such a harmonious Ramadan greeting collection! Simply lovely!" },
+            { src: "IMG_20260608_153607_695.jpg", title: "Minimalist Blue Ramadan Cards", category: "Ramadan Cards", praise: "The minimalist blue Ramadan cards with elegant mosque designs show such refined taste! Less is truly more in this beautiful set." },
+            { src: "IMG_20260608_153609_292.jpg", title: "Floral Ramadan in Advance Cards", category: "Ramadan Cards", praise: "The floral 'Ramadan Mubarak in advance' cards are so thoughtful and beautifully decorated! The watercolor flowers add such a delicate charm." },
+            { src: "IMG_20260608_153614_861.jpg", title: "Purple & Pink Ramadan Cards", category: "Ramadan Cards", praise: "The purple and pink gradient Ramadan cards with crescent moons are absolutely gorgeous! Such a dreamy color palette for blessed greetings." },
+            { src: "IMG_20260608_153616_136.jpg", title: "Surah Baqarah Calligraphy", category: "Islamic Calligraphy", praise: "The magnificent Surah Baqarah calligraphy with ornate geometric borders is absolutely breathtaking! Such devotion in every stroke." },
+            { src: "IMG_20260608_153617_878.jpg", title: "Ar-Rahman Gold Calligraphy", category: "Islamic Calligraphy", praise: "The golden Ar-Rahman calligraphy against the blue geometric patterns is so regal and divine! A true masterpiece of Islamic art." },
+            { src: "IMG_20260608_153620_912.jpg", title: "Dua, Sabr & Shukr Floral Cards", category: "Islamic Calligraphy", praise: "These three floral calligraphy cards for Dua, Sabr, and Shukr are so elegant! The roses intertwined with sacred words create pure beauty." },
+            { src: "IMG_20260608_153639_988.jpg", title: "Sabr on Rainbow Watercolor", category: "Islamic Calligraphy", praise: "The word 'Sabr' on a vibrant rainbow watercolor background is so uplifting! A beautiful reminder that patience brings colorful blessings." },
+            { src: "IMG_20260608_153700_888.jpg", title: "Salamun Qaulan Calligraphy", category: "Islamic Calligraphy", praise: "The graceful 'Salamun qaulan min Rabbin raheem' with delicate flower vases is so peaceful! It radiates divine tranquility in every letter." },
+            { src: "IMG_20260608_153730_893.jpg", title: "Importance of Salah Journal", category: "Quranic Journal Art", praise: "The 'Importance of Salah' journal page with the praying figure is so educational and heartwarming! A beautiful reminder of our daily connection with Allah." },
+            { src: "IMG_20260608_153732_491.jpg", title: "Salah Benefits Mosaic Journal", category: "Quranic Journal Art", praise: "The detailed Salah benefits journal with the stunning blue mosaic border is absolutely magnificent! Such creative and informative Islamic art." },
+            { src: "IMG_20260608_153733_935.jpg", title: "Improve Your Salah Guide", category: "Quranic Journal Art", praise: "The 'Improve Your Salah' guide with practical tips in both Urdu and English is so helpful and beautifully designed! A true labor of love." },
+            { src: "IMG_20260608_153735_740.jpg", title: "Sunflower Watercolor Painting", category: "Nature & Landscapes", praise: "These sunflowers painted in watercolor are so bright and cheerful! The way you captured their golden petals against the blue sky is simply delightful." },
+            { src: "IMG_20260608_153737_351.jpg", title: "Tulip Colored Pencil Drawing", category: "Nature & Landscapes", praise: "The tulip drawing in colored pencil shows such amazing detail and shading! The pink and white flowers look almost real. Stunning botanical art!" },
+            { src: "IMG_20260608_153739_018.jpg", title: "Disenthal Freedom Art", category: "Other Artworks", praise: "The conceptual 'Disenthal Freedom' art with the handprint and spider web is so thought-provoking! A powerful piece about breaking free from illusions." },
+            { src: "IMG_20260608_153740_401.jpg", title: "Space Popup Book", category: "Other Artworks", praise: "The space-themed popup book with planets, rocket, and asteroids is absolutely incredible! Such creative 3D paper engineering and cosmic imagination." },
+            { src: "IMG_20260608_153741_893.jpg", title: "Tangled Lanterns Scene", category: "Other Artworks", praise: "The Tangled-inspired lantern scene with the castle and boat is so romantic and magical! The floating lights create such a dreamy atmosphere." },
+            { src: "IMG_20260608_153743_826.jpg", title: "Hand-Painted Sunflower Pen Holder", category: "Other Artworks", praise: "The hand-painted sunflower pen holder is such a practical work of art! Turning everyday objects into beautiful canvases shows true artistic spirit." },
+            { src: "IMG_20260608_153745_793.jpg", title: "Anime Portrait with Hat", category: "Other Artworks", praise: "The anime-style portrait with the stylish hat is so cool and expressive! The orange hair and confident pose capture such vibrant personality." },
+            { src: "IMG_20260608_153759_903.jpg", title: "Fa Inna Ma'al Usri Yusra - Pink Mosque Art", category: "Islamic Calligraphy", praise: "A gorgeous pink watercolor piece with the beautiful verse 'With hardship comes ease' surrounded by mosque domes and stars. The color palette is so soothing and spiritually uplifting!" },
+            { src: "IMG_20260608_153802_545.jpg", title: "99 Names of Allah Colorful Grid", category: "Islamic Calligraphy", praise: "A stunning grid of Allah's 99 names painted in vibrant watercolor squares! Each name is written with such precision and love. The golden borders add such a beautiful finishing touch." },
+            { src: "IMG_20260608_153804_712.jpg", title: "Latifun Khabir Gold Calligraphy", category: "Islamic Calligraphy", praise: "The golden Arabic calligraphy on a dark mystical background with intricate floral patterns is absolutely regal! The contrast between the gold and deep colors creates such a divine atmosphere." },
+            { src: "IMG_20260608_153811_271.jpg", title: "Excellent Reward for Righteous Workers", category: "Islamic Calligraphy", praise: "The watercolor roses and soft green background make this Quranic verse from Surah Al-Ankabut so inviting! The English translation paired with elegant Arabic is beautifully balanced." },
+            { src: "IMG_20260608_153827_720.jpg", title: "Sunflower Verse Art", category: "Islamic Calligraphy", praise: "A bright sunflower bursting with the verse 'So remember Me, I will remember you'! The cheerful yellow against the turquoise background is so refreshing and joyful." },
+            { src: "IMG_20260608_153830_263.jpg", title: "Rose Silhouette in Hand", category: "Other Artworks", praise: "A dramatic black silhouette of a hand holding a rose against a warm beige background! The contrast and simplicity create such a powerful, romantic visual. Truly elegant!" },
+            { src: "IMG_20260608_153831_869.jpg", title: "Naruto Character Collage", category: "Other Artworks", praise: "An amazing collection of Naruto characters drawn with such vibrant colors! The way you captured each character's unique style and personality is absolutely fantastic. Anime fan art at its best!" },
+            { src: "IMG_20260608_153833_704.jpg", title: "Traditional Sari Portrait", category: "Portraits & Eyes", praise: "A beautiful portrait of a woman in a colorful traditional sari against a soft pink background! The intricate patterns on the sari and the graceful pose show such cultural appreciation and artistic skill." },
+            { src: "IMG_20260608_153835_187.jpg", title: "Noor Ki Dua - Handwritten Prayer", category: "Islamic Calligraphy", praise: "A heartfelt handwritten dua in beautiful Urdu calligraphy with red accents! The personal touch and devotion in every word makes this piece so special and spiritually moving." },
+            { src: "IMG_20260608_153838_529.jpg", title: "Pixel Sunset Cityscape", category: "Other Artworks", praise: "A creative pixel-art style cityscape at sunset with beautiful color blocking! The way you blended warm oranges and cool blues creates such a modern, digital-art aesthetic. So innovative!" }
+        ];
+
+        // ==================== CATEGORY MAPPING ====================
+        const categoryMap = {
+            'all': { title: 'All Artworks', desc: 'A beautiful collection of creativity, faith, and expression — 78 masterpieces', filter: () => true },
+            'calligraphy': { title: 'Islamic Calligraphy', desc: 'Sacred words transformed into visual poetry through beautiful Arabic script', filter: a => a.category === 'Islamic Calligraphy' },
+            'architecture': { title: 'Islamic Architecture', desc: 'Mosques, domes, and sacred structures captured with love and reverence', filter: a => a.category === 'Islamic Architecture' },
+            'awareness': { title: 'Awareness & Social Art', desc: 'Powerful art that speaks for justice, humanity, and compassion', filter: a => a.category === 'Awareness & Social Art' },
+            'nature': { title: 'Nature & Landscapes', desc: 'The beauty of Allah\'s creation captured in colors and strokes', filter: a => a.category === 'Nature & Landscapes' },
+            'journal': { title: 'Quranic Journal Art', desc: 'Beautiful spreads that make learning the Quran a visual delight', filter: a => a.category === 'Quranic Journal Art' },
+            'reminders': { title: 'Islamic Reminders', desc: 'Daily doses of spiritual motivation in elegant designs', filter: a => a.category === 'Islamic Reminders' },
+            'portraits': { title: 'Portraits & Eyes', desc: 'Windows to the soul captured with stunning detail and emotion', filter: a => a.category === 'Portraits & Eyes' },
+            'ramadan': { title: 'Ramadan Cards', desc: 'Festive greetings filled with love, light, and blessed celebrations', filter: a => a.category === 'Ramadan Cards' },
+            'other': { title: 'Other Artworks', desc: 'Unique creations that showcase the breadth of your artistic talent', filter: a => a.category === 'Other Artworks' }
+        };
+
+        // ==================== RENDER GALLERY ====================
+        function renderGallery() {
+            const main = document.getElementById('gallery-main');
+            
+            Object.keys(categoryMap).forEach(catId => {
+                const cat = categoryMap[catId];
+                const filtered = artworks.filter(cat.filter);
+                
+                const section = document.createElement('section');
+                section.id = catId;
+                section.className = `category-section${catId === 'all' ? ' active' : ''}`;
+                
+                section.innerHTML = `
+                    <h2 class="category-title">${cat.title}</h2>
+                    <p class="category-desc">${cat.desc} — ${filtered.length} artwork${filtered.length !== 1 ? 's' : ''}</p>
+                    <div class="gallery-grid">
+                        ${filtered.map((art, i) => `
+                            <div class="art-card" onclick="openLightbox(${artworks.indexOf(art)})" style="animation-delay: ${i * 0.08}s">
+                                <div class="art-image-container loading">
+                                    <img src="${art.src}" alt="${art.title}" class="art-image" loading="lazy" 
+                                        onerror="this.classList.add('error'); this.style.display='none';" 
+                                        onload="this.parentElement.classList.remove('loading')">
+                                    <div class="img-error"><div class="icon">🎨</div><div>${art.title}</div></div>
+                                    <div class="expand-icon">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="art-info">
+                                    <h3 class="art-title">${art.title}</h3>
+                                    <p class="art-praise">${art.praise} <span class="heart">❤</span></p>
+                                    <span class="category-tag">${art.category}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                main.appendChild(section);
+            });
+        }
+
+        // ==================== PARTICLES ====================
         const particlesContainer = document.getElementById('particles');
         const colors = ['#7b2cbf', '#b185db', '#ffd700', '#ff6b9d', '#4a1c6b'];
         for (let i = 0; i < 40; i++) {
@@ -1372,7 +682,7 @@
             particlesContainer.appendChild(particle);
         }
 
-        // Category switching
+        // ==================== CATEGORY SWITCHING ====================
         function showCategory(category) {
             document.querySelectorAll('.category-section').forEach(section => {
                 section.classList.remove('active');
@@ -1392,105 +702,84 @@
             });
         }
 
-        // Lightbox functionality - ONLY IMAGE FULLSCREEN
-        const allImages = [
-            { src: "Screenshot_20260608_130926_Instagram.jpg", title: "Calligraphy Collection" },
-            { src: "Screenshot_20260608_130939_Instagram.jpg", title: "Watercolor Calligraphy Strips" },
-            { src: "Screenshot_20260608_130951_Instagram.jpg", title: "Minar-e-Pakistan" },
-            { src: "Screenshot_20260608_131000_Instagram.jpg", title: "Serene Mountain Landscape" },
-            { src: "Screenshot_20260608_131011_Instagram.jpg", title: "Palestine Awareness Poster" },
-            { src: "Screenshot_20260608_131024_Instagram.jpg", title: "Anatomical Heart" },
-            { src: "Screenshot_20260608_131040_Instagram.jpg", title: "Moon Art" },
-            { src: "Screenshot_20260608_131106_Instagram.jpg", title: "Green Dome Mosque" },
-            { src: "Screenshot_20260608_131112_Instagram.jpg", title: "And He is With You Calligraphy" },
-            { src: "Screenshot_20260608_131117_Instagram.jpg", title: "Ya Hussain Calligraphy" },
-            { src: "Screenshot_20260608_131122_Instagram.jpg", title: "Hasbunallahu wa Ni\'mal Wakeel" },
-            { src: "Screenshot_20260608_131131_Instagram.jpg", title: "La ilaha illallah" },
-            { src: "Screenshot_20260608_131139_Instagram.jpg", title: "Palestine Journal Spread" },
-            { src: "Screenshot_20260608_131153_Instagram.jpg", title: "Kaaba & Green Dome Cards" },
-            { src: "Screenshot_20260608_131206_Instagram.jpg", title: "Mosque-Shaped Calligraphy" },
-            { src: "Screenshot_20260608_131213_Instagram.jpg", title: "Allah on Tree Bark" },
-            { src: "Screenshot_20260608_131221_Instagram.jpg", title: "Candle & Flower Calligraphy" },
-            { src: "Screenshot_20260608_131226_Instagram.jpg", title: "Dome Under the Moonlight" },
-            { src: "Screenshot_20260608_131232_Instagram.jpg", title: "Surah Duha Journal - Stars" },
-            { src: "Screenshot_20260608_131243_Instagram.jpg", title: "Surah Duha Journal - Roses" },
-            { src: "Screenshot_20260608_131252_Instagram.jpg", title: "Elegant Quranic Reminders" },
-            { src: "Screenshot_20260608_131300_Instagram.jpg", title: "Premium Reminder Collection" },
-            { src: "Screenshot_20260608_131306_Instagram.jpg", title: "Surah Duha Floral Spread" },
-            { src: "Screenshot_20260608_131328_Instagram.jpg", title: "Sujood at Sunset" },
-            { src: "Screenshot_20260608_131334_Instagram.jpg", title: "Sunflower Hardship & Ease" },
-            { src: "Screenshot_20260608_131342_Instagram.jpg", title: "Starry Night Islamic Journal" },
-            { src: "Snapchat-1470198826(1).jpg", title: "Mystic Purple Moon" },
-            { src: "IMG_20260608_132714_138.jpg", title: "Dervish Spirituality Journal" },
-            { src: "Snapchat-705301948.jpg", title: "Cosmic Garden Painting" },
-            { src: "Snapchat-1497800412.jpg", title: "Iridescent Eye on Grass" },
-            { src: "IMG_20260608_153459_462.jpg", title: "Mosque Architecture Sketch" },
-            { src: "IMG_20260608_153500_951.jpg", title: "Arabic Calligraphy on Pink" },
-            { src: "IMG_20260608_153502_427.jpg", title: "Palestine Solidarity Art" },
-            { src: "IMG_20260608_153503_773.jpg", title: "Anime Eyes Sketch" },
-            { src: "IMG_20260608_153505_004.jpg", title: "Beautiful Eyes, Beautiful Soul" },
-            { src: "IMG_20260608_153506_986.jpg", title: "Defying Fate Together" },
-            { src: "IMG_20260608_153508_569.jpg", title: "Eyes Are Windows of the Soul" },
-            { src: "IMG_20260608_153510_386.jpg", title: "Rainbow Beach Sunset" },
-            { src: "IMG_20260608_153519_921.jpg", title: "Enchanted Forest Stream" },
-            { src: "IMG_20260608_153521_537.jpg", title: "Sunset Calligraphy Art" },
-            { src: "IMG_20260608_153529_186.jpg", title: "Tulip & Bismillah Art" },
-            { src: "IMG_20260608_153530_639.jpg", title: "Surah Al-Ikhlas Journal Page" },
-            { src: "IMG_20260608_153531_913.jpg", title: "Surah Al-Falaq Journal" },
-            { src: "IMG_20260608_153535_675.jpg", title: "Surah An-Nas Journal" },
-            { src: "IMG_20260608_153537_137.jpg", title: "Surah Al-Kafirun Journal" },
-            { src: "IMG_20260608_153538_463.jpg", title: "Surah Al-Kawthar Journal" },
-            { src: "IMG_20260608_153541_537.jpg", title: "Colorful Ramadan Cards" },
-            { src: "IMG_20260608_153553_039.jpg", title: "Red & Gold Ramadan Cards" },
-            { src: "IMG_20260608_153603_086.jpg", title: "Pink Ramadan Cards Collection" },
-            { src: "IMG_20260608_153604_569.jpg", title: "Blue & Pink Ramadan Cards" },
-            { src: "IMG_20260608_153607_695.jpg", title: "Minimalist Blue Ramadan Cards" },
-            { src: "IMG_20260608_153609_292.jpg", title: "Floral Ramadan in Advance Cards" },
-            { src: "IMG_20260608_153614_861.jpg", title: "Purple & Pink Ramadan Cards" },
-            { src: "IMG_20260608_153616_136.jpg", title: "Surah Baqarah Calligraphy" },
-            { src: "IMG_20260608_153617_878.jpg", title: "Ar-Rahman Gold Calligraphy" },
-            { src: "IMG_20260608_153620_912.jpg", title: "Dua, Sabr & Shukr Floral Cards" },
-            { src: "IMG_20260608_153639_988.jpg", title: "Sabr on Rainbow Watercolor" },
-            { src: "IMG_20260608_153700_888.jpg", title: "Salamun Qaulan Calligraphy" },
-            { src: "IMG_20260608_153730_893.jpg", title: "Importance of Salah Journal" },
-            { src: "IMG_20260608_153732_491.jpg", title: "Salah Benefits Mosaic Journal" },
-            { src: "IMG_20260608_153733_935.jpg", title: "Improve Your Salah Guide" },
-            { src: "IMG_20260608_153735_740.jpg", title: "Sunflower Watercolor Painting" },
-            { src: "IMG_20260608_153737_351.jpg", title: "Tulip Colored Pencil Drawing" },
-            { src: "IMG_20260608_153739_018.jpg", title: "Disenthal Freedom Art" },
-            { src: "IMG_20260608_153740_401.jpg", title: "Space Popup Book" },
-            { src: "IMG_20260608_153741_893.jpg", title: "Tangled Lanterns Scene" },
-            { src: "IMG_20260608_153743_826.jpg", title: "Hand-Painted Sunflower Pen Holder" },
-            { src: "IMG_20260608_153745_793.jpg", title: "Anime Portrait with Hat" },
-            { src: "IMG_20260608_153759_903.jpg", title: "Fa Inna Ma\'al Usri Yusra - Pink Mosque Art" },
-            { src: "IMG_20260608_153802_545.jpg", title: "99 Names of Allah Colorful Grid" },
-            { src: "IMG_20260608_153804_712.jpg", title: "Latifun Khabir Gold Calligraphy" },
-            { src: "IMG_20260608_153811_271.jpg", title: "Excellent Reward for Righteous Workers" },
-            { src: "IMG_20260608_153827_720.jpg", title: "Sunflower Verse Art" },
-            { src: "IMG_20260608_153830_263.jpg", title: "Rose Silhouette in Hand" },
-            { src: "IMG_20260608_153831_869.jpg", title: "Naruto Character Collage" },
-            { src: "IMG_20260608_153833_704.jpg", title: "Traditional Sari Portrait" },
-            { src: "IMG_20260608_153835_187.jpg", title: "Noor Ki Dua - Handwritten Prayer" },
-            { src: "IMG_20260608_153838_529.jpg", title: "Pixel Sunset Cityscape" }
-        ];
-
+        // ==================== LIGHTBOX & ZOOM ====================
         let currentIndex = 0;
+        let zoomLevel = 1;
+        let isDragging = false;
+        let startX, startY, translateX = 0, translateY = 0;
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxWrapper = document.getElementById('lightbox-wrapper');
+        const zoomLevelEl = document.getElementById('zoom-level');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+
+        function updateZoomDisplay() {
+            zoomLevelEl.textContent = Math.round(zoomLevel * 100) + '%';
+            zoomInBtn.disabled = zoomLevel >= 5;
+            zoomOutBtn.disabled = zoomLevel <= 0.5;
+            
+            if (zoomLevel > 1) {
+                lightboxImg.classList.add('zoomed');
+                lightboxWrapper.classList.add('is-zoomed');
+            } else {
+                lightboxImg.classList.remove('zoomed');
+                lightboxWrapper.classList.remove('is-zoomed');
+                translateX = 0;
+                translateY = 0;
+            }
+            
+            applyTransform();
+        }
+
+        function applyTransform() {
+            lightboxImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${zoomLevel})`;
+        }
+
+        function zoomIn() {
+            if (zoomLevel < 5) {
+                zoomLevel = Math.min(zoomLevel + 0.5, 5);
+                updateZoomDisplay();
+            }
+        }
+
+        function zoomOut() {
+            if (zoomLevel > 0.5) {
+                zoomLevel = Math.max(zoomLevel - 0.5, 0.5);
+                if (zoomLevel <= 1) {
+                    translateX = 0;
+                    translateY = 0;
+                }
+                updateZoomDisplay();
+            }
+        }
+
+        function resetZoom() {
+            zoomLevel = 1;
+            translateX = 0;
+            translateY = 0;
+            updateZoomDisplay();
+        }
 
         function openLightbox(index) {
             currentIndex = index;
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightbox-img');
-            const errorDiv = document.getElementById('lightbox-error');
+            const art = artworks[currentIndex];
+            
+            resetZoom();
+            
+            lightboxImg.style.animation = 'none';
+            lightboxImg.classList.remove('error');
+            document.getElementById('lightbox-error').classList.remove('active');
+            lightboxImg.style.display = 'block';
 
-            img.style.animation = 'none';
-            img.classList.remove('error');
-            errorDiv.classList.remove('active');
-            img.style.display = 'block';
+            document.getElementById('lightbox-title').textContent = art.title;
+            document.getElementById('lightbox-category').textContent = art.category;
 
             setTimeout(() => {
-                img.src = allImages[currentIndex].src;
-                img.alt = allImages[currentIndex].title;
-                img.style.animation = 'zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                lightboxImg.src = art.src;
+                lightboxImg.alt = art.title;
+                lightboxImg.style.animation = 'zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             }, 10);
 
             lightbox.classList.add('active');
@@ -1498,34 +787,109 @@
         }
 
         function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('active');
+            lightbox.classList.remove('active');
             document.body.style.overflow = 'auto';
-            // Clear the image src to prevent flash on next open
             setTimeout(() => {
-                document.getElementById('lightbox-img').src = '';
+                lightboxImg.src = '';
+                resetZoom();
             }, 300);
         }
 
-        // Keyboard navigation - Escape to close only
-        document.addEventListener('keydown', function(e) {
-            if (!document.getElementById('lightbox').classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
+        function prevImage() {
+            currentIndex = (currentIndex - 1 + artworks.length) % artworks.length;
+            openLightbox(currentIndex);
+        }
+
+        function nextImage() {
+            currentIndex = (currentIndex + 1) % artworks.length;
+            openLightbox(currentIndex);
+        }
+
+        // ==================== DRAG TO PAN (when zoomed) ====================
+        lightboxWrapper.addEventListener('mousedown', (e) => {
+            if (zoomLevel <= 1) return;
+            isDragging = true;
+            startX = e.clientX - translateX;
+            startY = e.clientY - translateY;
+            lightboxWrapper.style.cursor = 'grabbing';
         });
 
-        // Close on background click (anywhere outside the image)
-        const lightbox = document.getElementById('lightbox');
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            translateX = e.clientX - startX;
+            translateY = e.clientY - startY;
+            applyTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            lightboxWrapper.style.cursor = zoomLevel > 1 ? 'grab' : 'default';
+        });
+
+        // Touch support for mobile pan
+        lightboxWrapper.addEventListener('touchstart', (e) => {
+            if (zoomLevel <= 1) return;
+            isDragging = true;
+            startX = e.touches[0].clientX - translateX;
+            startY = e.touches[0].clientY - translateY;
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            translateX = e.touches[0].clientX - startX;
+            translateY = e.touches[0].clientY - startY;
+            applyTransform();
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // Double-click to zoom toggle
+        lightboxWrapper.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            if (zoomLevel > 1) {
+                resetZoom();
+            } else {
+                zoomLevel = 2.5;
+                updateZoomDisplay();
+            }
+        });
+
+        // ==================== KEYBOARD NAVIGATION ====================
+        document.addEventListener('keydown', function(e) {
+            if (!lightbox.classList.contains('active')) return;
+            
+            switch(e.key) {
+                case 'Escape': closeLightbox(); break;
+                case 'ArrowLeft': prevImage(); break;
+                case 'ArrowRight': nextImage(); break;
+                case '+': case '=': zoomIn(); break;
+                case '-': zoomOut(); break;
+                case '0': resetZoom(); break;
+            }
+        });
+
+        // Close on background click
         lightbox.addEventListener('click', function(e) {
-            if (e.target === this || e.target.classList.contains('lightbox-img-container')) {
+            if (e.target === this || e.target.classList.contains('lightbox-img-wrapper')) {
                 closeLightbox();
             }
         });
 
-        // Add loading class to image containers
-        document.querySelectorAll('.art-image-container').forEach(container => {
-            container.classList.add('loading');
-        });
+        // ==================== WHEEL ZOOM ====================
+        lightboxWrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        }, { passive: false });
 
-        // Intersection Observer for lazy animation trigger
+        // ==================== INTERSECTION OBSERVER ====================
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -1535,6 +899,9 @@
             });
         }, { threshold: 0.1 });
 
+        // ==================== INITIALIZE ====================
+        renderGallery();
+        
         document.querySelectorAll('.art-card').forEach(card => {
             observer.observe(card);
         });
